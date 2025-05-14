@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "112327642719",
+    "project_id": "cuidaplus-2d542",
+    "storage_bucket": "cuidaplus-2d542.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112327642719:android:4b904c1e4f4037cc2215ea",
+        "android_client_info": {
+          "package_name": "net.azarquiel.cuidaplusjpc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "112327642719-fvn1ecpe5qgn1icn3qs3gri1tf1dc83e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKFAUHCDuF3XEuxrO_ByWGEl9ZQfRFt9o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112327642719-fvn1ecpe5qgn1icn3qs3gri1tf1dc83e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
