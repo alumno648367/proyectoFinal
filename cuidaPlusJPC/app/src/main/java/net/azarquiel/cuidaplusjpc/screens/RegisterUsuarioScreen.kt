@@ -6,83 +6,72 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import net.azarquiel.cuidaplusjpc.model.Usuario
+import com.google.firebase.auth.FirebaseAuth
+import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
-import java.util.*
 
 @Composable
 fun RegisterUsuarioScreen(navController: NavHostController, viewModel: MainViewModel) {
     Scaffold(
-        topBar = { CustomTopBar("Registro de Usuario") },
+        topBar = { ("Crear cuenta") },
         content = { padding ->
-            CustomRegisterContent(padding, viewModel)
+            CustomRegisterUsuarioContent(padding, navController)
         }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CustomTopBar(titulo: String) {
-    TopAppBar(
-        title = { Text(text = titulo) },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.background
-        )
-    )
-}
-
-@Composable
-fun CustomRegisterContent(padding: PaddingValues, viewModel: MainViewModel) {
-    val usuarioVM = viewModel.usuarioVM
+fun CustomRegisterUsuarioContent(padding: PaddingValues, navController: NavHostController) {
     val context = LocalContext.current
-
-    var nombre by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-    var telefono by remember { mutableStateOf("") }
-    var fechaNacimiento by remember { mutableStateOf("") }
-    var grupoFamiliarId by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .padding(16.dp)
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center
     ) {
-        OutlinedTextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
-        OutlinedTextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
-        OutlinedTextField(value = telefono, onValueChange = { telefono = it }, label = { Text("Teléfono") })
-        OutlinedTextField(value = fechaNacimiento, onValueChange = { fechaNacimiento = it }, label = { Text("Fecha de nacimiento") })
-        OutlinedTextField(value = grupoFamiliarId, onValueChange = { grupoFamiliarId = it }, label = { Text("Grupo Familiar ID") })
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = password,
+            onValueChange = { password = it },
+            label = { Text("Contraseña") },
+            modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation()
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(onClick = {
-            if (nombre.isBlank() || email.isBlank() || telefono.isBlank()) {
-                Toast.makeText(context, "Por favor rellena todos los campos", Toast.LENGTH_LONG).show()
-            } else {
-                val usuario = Usuario(
-                    usuarioId = UUID.randomUUID().toString(), // temporal
-                    nombre = nombre,
-                    email = email,
-                    numTelefono = telefono,
-                    fechaNacimiento = fechaNacimiento,
-                    grupoFamiliarId = grupoFamiliarId
-                )
-                usuarioVM.guardarUsuario(usuario,
-                    onSuccess = {
-                        Toast.makeText(context, "Usuario guardado correctamente", Toast.LENGTH_SHORT).show()
-                    },
-                    onFailure = {
-                        Toast.makeText(context, "Error al guardar", Toast.LENGTH_SHORT).show()
-                    }
-                )
-            }
-        }) {
-            Text("Guardar Usuario")
+        Button(
+            onClick = {
+                if (email.isNotBlank() && password.isNotBlank()) {
+                    FirebaseAuth.getInstance()
+                        .createUserWithEmailAndPassword(email, password)
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Usuario creado", Toast.LENGTH_SHORT).show()
+                            navController.navigate(AppScreens.RegisterCompletoScreen.route)
+                        }
+                        .addOnFailureListener {
+                            Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
+                        }
+                } else {
+                    Toast.makeText(context, "Rellena todos los campos", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Crear cuenta")
         }
     }
 }

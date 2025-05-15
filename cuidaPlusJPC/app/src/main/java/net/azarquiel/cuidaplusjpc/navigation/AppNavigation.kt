@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import net.azarquiel.cuidaplusjpc.screens.HomeScreen
+import net.azarquiel.cuidaplusjpc.screens.LoginUsuarioScreen
+import net.azarquiel.cuidaplusjpc.screens.RegisterCompletoScreen
 import net.azarquiel.cuidaplusjpc.screens.RegisterUsuarioScreen
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
@@ -12,12 +15,24 @@ import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 fun AppNavigation(viewModel: MainViewModel) {
     val navController = rememberNavController()
     NavHost(navController = navController,
-        startDestination = AppScreens.RegisterUsuarioScreen.route){
+        startDestination = AppScreens.HomeScreen.route){
+        composable(AppScreens.HomeScreen.route){
+            HomeScreen(navController, viewModel)
+        }
         composable(AppScreens.RegisterUsuarioScreen.route){
             RegisterUsuarioScreen(navController, viewModel)
+        }
+        composable(AppScreens.RegisterCompletoScreen.route){
+            RegisterCompletoScreen(navController, viewModel)
+        }
+        composable(AppScreens.LoginUsuarioScreen.route){
+            LoginUsuarioScreen(navController, viewModel)
         }
     }
 }
 sealed class AppScreens(val route: String) {
+    object HomeScreen: AppScreens(route = "HomeScreen")
     object RegisterUsuarioScreen: AppScreens(route = "RegisterUsuarioScreen")
+    object RegisterCompletoScreen: AppScreens(route = "RegisterCompletoScreen")
+    object LoginUsuarioScreen: AppScreens(route = "LoginUsuarioScreen")
 }
