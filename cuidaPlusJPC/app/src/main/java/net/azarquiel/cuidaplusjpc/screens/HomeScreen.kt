@@ -39,7 +39,6 @@ fun CustomHomeContent(padding: PaddingValues, navController: NavHostController) 
         verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Logo + texto Cuida+
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -59,7 +58,6 @@ fun CustomHomeContent(padding: PaddingValues, navController: NavHostController) 
             )
         }
 
-        // Eslogan
         Text(
             text = "Cuidamos a los que más importan",
             fontSize = 18.sp,
@@ -69,7 +67,6 @@ fun CustomHomeContent(padding: PaddingValues, navController: NavHostController) 
             modifier = Modifier.padding(horizontal = 12.dp)
         )
 
-        // Botón principal
         Button(
             onClick = { navController.navigate(AppScreens.RegisterUsuarioScreen.route) },
             modifier = Modifier
@@ -84,7 +81,6 @@ fun CustomHomeContent(padding: PaddingValues, navController: NavHostController) 
             Text("Empezar", fontSize = 18.sp)
         }
 
-        // Enlace a login
         Text(
             text = "¿Ya tienes una cuenta? Inicia sesión",
             modifier = Modifier

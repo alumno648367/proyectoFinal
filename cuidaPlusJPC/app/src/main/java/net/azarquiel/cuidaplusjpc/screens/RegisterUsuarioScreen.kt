@@ -23,19 +23,17 @@ import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
 @Composable
 fun RegisterUsuarioScreen(navController: NavHostController, viewModel: MainViewModel) {
-    RegisterUsuarioContent(navController)
+    RegisterUsuarioContent(navController, viewModel)
 }
 
 @Composable
-fun RegisterUsuarioContent(navController: NavHostController) {
+fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainViewModel) {
     val context = LocalContext.current
     val clientId = stringResource(id = R.string.default_web_client_id)
 
@@ -55,15 +53,15 @@ fun RegisterUsuarioContent(navController: NavHostController) {
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            FirebaseAuth.getInstance().signInWithCredential(credential)
-                .addOnSuccessListener {
+            viewModel.registroConGoogle(account.idToken ?: "",
+                onSuccess = {
                     Toast.makeText(context, "Sesión iniciada con Google", Toast.LENGTH_SHORT).show()
                     navController.navigate(AppScreens.RegisterCompletoScreen.route)
+                },
+                onFailure = {
+                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                 }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
+            )
         } catch (e: Exception) {
             Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
@@ -146,15 +144,15 @@ fun RegisterUsuarioContent(navController: NavHostController) {
                 showPasswordError = !passwordOk
 
                 if (emailOk && passwordOk) {
-                    FirebaseAuth.getInstance()
-                        .createUserWithEmailAndPassword(email, password)
-                        .addOnSuccessListener {
+                    viewModel.registroConEmail(email, password,
+                        onSuccess = {
                             Toast.makeText(context, "Usuario creado", Toast.LENGTH_SHORT).show()
                             navController.navigate(AppScreens.RegisterCompletoScreen.route)
+                        },
+                        onFailure = {
+                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
-                        }
+                    )
                 } else {
                     Toast.makeText(context, "Rellena todos los campos", Toast.LENGTH_SHORT).show()
                 }
@@ -170,10 +168,8 @@ fun RegisterUsuarioContent(navController: NavHostController) {
             Text("Crear cuenta", fontSize = 16.sp)
         }
 
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botón Google
         Button(
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent

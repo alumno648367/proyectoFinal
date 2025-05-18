@@ -18,9 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import net.azarquiel.cuidaplusjpc.R
-import net.azarquiel.cuidaplusjpc.model.GrupoFamiliar
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -100,7 +98,6 @@ fun RegisterCompletoContent(
         calendar.get(Calendar.DAY_OF_MONTH),
     )
 
-    // Grupo
     var opcionGrupo by remember { mutableStateOf("crear") }
     var nombreGrupo by remember { mutableStateOf("") }
     var grupoIdExistente by remember { mutableStateOf("") }
@@ -243,76 +240,55 @@ fun RegisterCompletoContent(
         var isGuardando by remember { mutableStateOf(false) }
         Button(
             onClick = {
+                if (isGuardando) return@Button
                 val telefonoLong = telefono.toLongOrNull()
-                if (nombre.isBlank() || telefonoLong == null || fechaNacimientoTexto.isBlank()) {
-                    Toast.makeText(context, "Rellena todos los campos correctamente", Toast.LENGTH_LONG).show()
+                if (nombre.isBlank() || telefonoLong == null || fechaNacimientoDate == null) {
+                    Toast.makeText(
+                        context,
+                        "Rellena todos los campos correctamente",
+                        Toast.LENGTH_LONG
+                    ).show()
                     return@Button
                 }
 
+                isGuardando = true
                 val usuario = Usuario(
                     usuarioId = uid,
                     nombre = nombre,
                     email = email,
                     numTelefono = telefonoLong,
-                    fechaNacimiento = fechaNacimientoDate ?: Date()
+                    fechaNacimiento = fechaNacimientoDate!!
                 )
 
                 if (opcionGrupo == "crear") {
-                    val db = FirebaseFirestore.getInstance()
-                    db.collection("gruposFamiliares")
-                        .whereEqualTo("nombre", nombreGrupo)
-                        .get()
-                        .addOnSuccessListener { result ->
-                            if (!result.isEmpty) {
-                                isGuardando = false
-                                Toast.makeText(context, "Ya existe un grupo con ese nombre", Toast.LENGTH_SHORT).show()
-                            } else {
-                                val grupoId = db.collection("gruposFamiliares").document().id
-                                val grupo = GrupoFamiliar(
-                                    grupoFamiliarId = grupoId,
-                                    nombre = nombreGrupo,
-                                    miembros = listOf(uid),
-                                    pacientes = emptyList()
-                                )
-                                grupoVM.crearGrupo(grupo,
-                                    onSuccess = {
-                                        usuarioVM.guardarUsuario(usuario,
-                                            onSuccess = {
-                                                isGuardando = false
-                                                Toast.makeText(context, "Usuario y grupo creados", Toast.LENGTH_SHORT).show()
-                                                // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
-                                            },
-                                            onFailure = {
-                                                isGuardando = false
-                                                Toast.makeText(context, "Error al guardar usuario", Toast.LENGTH_SHORT).show()
-                                            }
-                                        )
-                                    },
-                                    onFailure = {
-                                        isGuardando = false
-                                        Toast.makeText(context, "Error al crear grupo", Toast.LENGTH_SHORT).show()
-                                    }
-                                )
-                            }
-                        }
-                        .addOnFailureListener {
-                            isGuardando = false
-                            Toast.makeText(context, "Error al verificar grupo", Toast.LENGTH_SHORT).show()
-                        }
-
-                } else {
-                    grupoVM.añadirMiembro(grupoIdExistente, uid)
-                    usuarioVM.guardarUsuario(usuario,
+                    viewModel.crearGrupoYUsuario(nombreGrupo, uid, usuario,
                         onSuccess = {
-                            Toast.makeText(context, "Usuario unido al grupo", Toast.LENGTH_SHORT).show()
+                            isGuardando = false
+                            Toast.makeText(context, "Usuario y grupo creados", Toast.LENGTH_SHORT)
+                                .show()
                             // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
                         },
                         onFailure = {
-                            Toast.makeText(context, "Error al guardar usuario", Toast.LENGTH_SHORT).show()
+                            isGuardando = false
+                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                } else {
+                    viewModel.unirseAGrupoYGuardarUsuario(grupoIdExistente, uid, usuario,
+                        onSuccess = {
+                            isGuardando = false
+                            Toast.makeText(context, "Usuario unido al grupo", Toast.LENGTH_SHORT)
+                                .show()
+                            // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
+                        },
+                        onFailure = {
+                            isGuardando = false
+                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         }
                     )
                 }
             },
+            enabled = !isGuardando,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),

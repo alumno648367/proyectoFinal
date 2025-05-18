@@ -22,11 +22,8 @@ import androidx.navigation.NavHostController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
-import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 
 @Composable
 fun LoginUsuarioScreen(navController: NavHostController, viewModel: MainViewModel) {
@@ -55,15 +52,15 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
-            val credential = GoogleAuthProvider.getCredential(account.idToken, null)
-            FirebaseAuth.getInstance().signInWithCredential(credential)
-                .addOnSuccessListener {
+            viewModel.loginConGoogle(account.idToken ?: "",
+                onSuccess = {
                     Toast.makeText(context, "Sesión iniciada con Google", Toast.LENGTH_SHORT).show()
                     // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
+                },
+                onFailure = {
+                    Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                 }
-                .addOnFailureListener {
-                    Toast.makeText(context, "Error: ${it.message}", Toast.LENGTH_SHORT).show()
-                }
+            )
         } catch (e: Exception) {
             Toast.makeText(context, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
@@ -138,17 +135,15 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
                 showPasswordError = !passwordOk
 
                 if (emailOk && passwordOk) {
-                    FirebaseAuth.getInstance()
-                        .signInWithEmailAndPassword(email, password)
-                        .addOnSuccessListener {
-                            val uid = it.user?.uid ?: ""
-                            usuarioVM.empezarEscucha(uid)
+                    viewModel.loginConEmail(email, password,
+                        onSuccess = {
                             Toast.makeText(context, "Sesión iniciada", Toast.LENGTH_SHORT).show()
                             // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
+                        },
+                        onFailure = {
+                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
                         }
-                        .addOnFailureListener {
-                            Toast.makeText(context, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
-                        }
+                    )
                 } else {
                     Toast.makeText(context, "Introduce email y contraseña", Toast.LENGTH_SHORT).show()
                 }
@@ -162,6 +157,24 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             )
         ) {
             Text("Iniciar sesión", fontSize = 16.sp)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        TextButton(onClick = {
+            if (email.isBlank()) {
+                Toast.makeText(context, "Introduce tu email para recuperar la contraseña", Toast.LENGTH_SHORT).show()
+            } else {
+                viewModel.recuperarPassword(email) { success, message ->
+                    Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }) {
+            Text(
+                text = "¿Has olvidado tu contraseña?",
+                color = colorResource(R.color.primario),
+                fontSize = 14.sp
+            )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
