@@ -6,5 +6,6 @@ import net.azarquiel.cuidaplusjpc.view.MainActivity
 class MainViewModel(mainActivity: MainActivity) : ViewModel() {
 
    val usuarioVM = UsuarioViewModel()
+   val grupoVM = GrupoFamiliarViewModel()
 
 }

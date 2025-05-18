@@ -1,8 +1,8 @@
 package net.azarquiel.cuidaplusjpc.viewmodel
 
+import Usuario
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import net.azarquiel.cuidaplusjpc.model.Usuario
 import net.azarquiel.cuidaplusjpc.repository.UsuarioRepository
 
 class UsuarioViewModel : ViewModel() {
@@ -26,4 +26,12 @@ class UsuarioViewModel : ViewModel() {
     ) {
         repo.guardarUsuario(usuario, onSuccess, onFailure)
     }
+    fun actualizarUsuario(uid: String, campos: Map<String, Any>, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        repo.actualizarUsuario(uid, campos, onSuccess, onFailure)
+    }
+
+    fun eliminarUsuario(uid: String, onSuccess: () -> Unit, onFailure: (Exception) -> Unit) {
+        repo.eliminarUsuario(uid, onSuccess, onFailure)
+    }
+
 }

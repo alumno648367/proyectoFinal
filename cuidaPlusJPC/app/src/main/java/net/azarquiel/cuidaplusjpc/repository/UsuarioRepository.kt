@@ -1,8 +1,8 @@
 package net.azarquiel.cuidaplusjpc.repository
 
+import Usuario
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import net.azarquiel.cuidaplusjpc.model.Usuario
 
 class UsuarioRepository {
 
@@ -37,4 +37,27 @@ class UsuarioRepository {
                 onChange(usuario) // pasa el resultado al ViewModel
             }
     }
+
+    fun actualizarUsuario(
+        uid: String,
+        campos: Map<String, Any>,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        ref.document(uid).update(campos)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+    fun eliminarUsuario(
+        uid: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        ref.document(uid).delete()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+
+
 }

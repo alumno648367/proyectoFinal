@@ -1,9 +1,9 @@
-package net.azarquiel.cuidaplusjpc.model
+import java.util.Date
 
 data class Usuario(
-    var usuarioId: String = "",         // UID del usuario (Firebase Auth)
+    var usuarioId: String = "",
     var nombre: String = "",
-    var fechaNacimiento: String = "",   // Puedes usar Date si lo manejas con adaptadores
+    var fechaNacimiento: Date = Date(),  // tipo Date real
     var email: String = "",
-    var numTelefono: String = ""
+    var numTelefono: Long = 0L
 )
