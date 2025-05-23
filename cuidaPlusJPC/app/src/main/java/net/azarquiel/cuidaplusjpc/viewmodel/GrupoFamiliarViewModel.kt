@@ -2,6 +2,7 @@ package net.azarquiel.cuidaplusjpc.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import net.azarquiel.cuidaplusjpc.model.GrupoFamiliar
 import net.azarquiel.cuidaplusjpc.repository.GrupoFamiliarRepository
 
@@ -80,4 +81,11 @@ class GrupoFamiliarViewModel : ViewModel() {
             grupo.value = it
         }
     }
+    fun obtenerGrupoPorNombre(nombre: String, onResult: (GrupoFamiliar?) -> Unit) {
+        repo.obtenerGrupoPorNombre(nombre, onResult)
+    }
+
+
+
+
 }

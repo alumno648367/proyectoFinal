@@ -6,6 +6,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +18,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -23,6 +26,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import net.azarquiel.cuidaplusjpc.R
+import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
 @Composable
@@ -70,6 +74,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
     var password by remember { mutableStateOf("") }
     var showEmailError by remember { mutableStateOf(false) }
     var showPasswordError by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -114,7 +119,15 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             },
             label = { Text("Contraseña") },
             isError = showPasswordError,
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = icon, contentDescription = description)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
@@ -138,7 +151,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
                     viewModel.loginConEmail(email, password,
                         onSuccess = {
                             Toast.makeText(context, "Sesión iniciada", Toast.LENGTH_SHORT).show()
-                            // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
+                             navController.navigate(AppScreens.MiCuentaScreen.route)
                         },
                         onFailure = {
                             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()

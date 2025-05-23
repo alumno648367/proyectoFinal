@@ -6,6 +6,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -16,6 +18,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,6 +74,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
     var password by remember { mutableStateOf("") }
     var showEmailError by remember { mutableStateOf(false) }
     var showPasswordError by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -115,7 +119,15 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             },
             label = { Text("Contraseña") },
             isError = showPasswordError,
-            visualTransformation = PasswordVisualTransformation(),
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
+                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = icon, contentDescription = description)
+                }
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 24.dp),
@@ -126,6 +138,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
                 focusedLabelColor = colorResource(R.color.primario)
             )
         )
+
 
         Text(
             text = "Al registrarte, aceptas la Política de privacidad y los Términos de servicio",

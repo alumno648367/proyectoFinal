@@ -12,5 +12,8 @@
     <color name="fondo_claro">#EAF6F6</color>
     <color name="texto_principal">#123C3D</color>
     <color name="error">#EF5350</color>
+    <color name="color_tarjeta">#D0ECEA</color>
+
+
 
 </resources>

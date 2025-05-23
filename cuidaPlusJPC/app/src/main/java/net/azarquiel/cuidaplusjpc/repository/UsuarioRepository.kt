@@ -6,26 +6,32 @@ import com.google.firebase.firestore.ktx.toObject
 
 class UsuarioRepository {
 
-    // Conexión a la base de datos Firestore
+    // Conexión principal a Firebase Firestore
     private val db = FirebaseFirestore.getInstance()
 
-    // Referencia a la colección "usuarios"
+    // Referencia directa a la colección "usuarios"
     private val ref = db.collection("usuarios")
 
-    // Guarda el usuario completo en Firestore
+    /**
+     * Guarda el documento del usuario en la base de datos
+     * - Si el documento ya existe, lo sobrescribe
+     * - El ID del documento es el UID del usuario autenticado
+     */
     fun guardarUsuario(
         usuario: Usuario,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
-        // crea o sobreescribe el documento con el ID del usuario
         ref.document(usuario.usuarioId)
             .set(usuario)
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
 
-    // Escucha en tiempo real los cambios del usuario por su ID
+    /**
+     * Escucha los cambios en tiempo real del documento de un usuario
+     * - Cada vez que el documento se actualiza, se recibe el nuevo objeto Usuario
+     */
     fun escucharUsuario(
         uid: String,
         onChange: (Usuario?) -> Unit
@@ -33,11 +39,15 @@ class UsuarioRepository {
         ref.document(uid)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) return@addSnapshotListener
-                val usuario = snapshot?.toObject<Usuario>() // convierte documento a objeto Usuario
-                onChange(usuario) // pasa el resultado al ViewModel
+                val usuario = snapshot?.toObject<Usuario>()
+                onChange(usuario)
             }
     }
 
+    /**
+     * Actualiza campos específicos del documento del usuario
+     * - Solo modifica los campos incluidos en el Map
+     */
     fun actualizarUsuario(
         uid: String,
         campos: Map<String, Any>,
@@ -48,6 +58,10 @@ class UsuarioRepository {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+
+    /**
+     * Elimina el documento completo del usuario en Firestore
+     */
     fun eliminarUsuario(
         uid: String,
         onSuccess: () -> Unit,
@@ -57,7 +71,4 @@ class UsuarioRepository {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
-
-
-
 }

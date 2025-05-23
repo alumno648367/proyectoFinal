@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import net.azarquiel.cuidaplusjpc.screens.HomeScreen
 import net.azarquiel.cuidaplusjpc.screens.LoginUsuarioScreen
+import net.azarquiel.cuidaplusjpc.screens.MiCuentaScreen
 import net.azarquiel.cuidaplusjpc.screens.RegisterCompletoScreen
 import net.azarquiel.cuidaplusjpc.screens.RegisterUsuarioScreen
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
@@ -28,6 +29,9 @@ fun AppNavigation(viewModel: MainViewModel) {
         composable(AppScreens.LoginUsuarioScreen.route){
             LoginUsuarioScreen(navController, viewModel)
         }
+        composable(AppScreens.MiCuentaScreen.route){
+            MiCuentaScreen(navController, viewModel)
+        }
     }
 }
 sealed class AppScreens(val route: String) {
@@ -35,4 +39,5 @@ sealed class AppScreens(val route: String) {
     object RegisterUsuarioScreen: AppScreens(route = "RegisterUsuarioScreen")
     object RegisterCompletoScreen: AppScreens(route = "RegisterCompletoScreen")
     object LoginUsuarioScreen: AppScreens(route = "LoginUsuarioScreen")
+    object MiCuentaScreen: AppScreens(route = "MiCuentaScreen")
 }

@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import net.azarquiel.cuidaplusjpc.R
+import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
@@ -100,7 +101,7 @@ fun RegisterCompletoContent(
 
     var opcionGrupo by remember { mutableStateOf("crear") }
     var nombreGrupo by remember { mutableStateOf("") }
-    var grupoIdExistente by remember { mutableStateOf("") }
+    var nombreGrupoExistente by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -157,7 +158,16 @@ fun RegisterCompletoContent(
         ) {
             OutlinedTextField(
                 value = fechaNacimientoTexto,
-                onValueChange = { fechaNacimientoTexto = it },
+                onValueChange = {
+                    fechaNacimientoTexto = it
+                    val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    try {
+                        fechaNacimientoDate = formato.parse(it)
+                    } catch (e: Exception) {
+                        fechaNacimientoDate = null
+                    }
+                }
+                ,
                 label = { Text("Fecha de nacimiento") },
                 modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -223,9 +233,9 @@ fun RegisterCompletoContent(
             )
         } else {
             OutlinedTextField(
-                value = grupoIdExistente,
-                onValueChange = { grupoIdExistente = it },
-                label = { Text("ID del grupo") },
+                value = nombreGrupoExistente,
+                onValueChange = { nombreGrupoExistente = it },
+                label = { Text("Nombre del grupo") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = colorResource(R.color.primario),
@@ -266,7 +276,8 @@ fun RegisterCompletoContent(
                             isGuardando = false
                             Toast.makeText(context, "Usuario y grupo creados", Toast.LENGTH_SHORT)
                                 .show()
-                            // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
+                            viewModel.usuarioVM.empezarEscucha(uid)
+                             navController.navigate(AppScreens.MiCuentaScreen.route)
                         },
                         onFailure = {
                             isGuardando = false
@@ -274,12 +285,12 @@ fun RegisterCompletoContent(
                         }
                     )
                 } else {
-                    viewModel.unirseAGrupoYGuardarUsuario(grupoIdExistente, uid, usuario,
+                    viewModel.unirseAGrupoPorNombre(nombreGrupoExistente, uid, usuario,
                         onSuccess = {
                             isGuardando = false
-                            Toast.makeText(context, "Usuario unido al grupo", Toast.LENGTH_SHORT)
-                                .show()
-                            // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
+                            Toast.makeText(context, "Usuario unido al grupo", Toast.LENGTH_SHORT).show()
+                            viewModel.usuarioVM.empezarEscucha(uid)
+                            navController.navigate(AppScreens.MiCuentaScreen.route)
                         },
                         onFailure = {
                             isGuardando = false

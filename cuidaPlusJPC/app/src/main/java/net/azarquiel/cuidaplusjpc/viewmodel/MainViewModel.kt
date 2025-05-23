@@ -13,6 +13,7 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
    // ViewModels específicos para usuario y grupo familiar
    val usuarioVM = UsuarioViewModel()
    val grupoVM = GrupoFamiliarViewModel()
+   val pacienteVM = PacienteViewModel()
 
    // Instancias únicas de FirebaseAuth y Firestore
    val auth = FirebaseAuth.getInstance()
@@ -130,7 +131,8 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
                )
                grupoVM.crearGrupo(grupo,
                   onSuccess = {
-                     usuarioVM.guardarUsuario(usuario,
+                     val usuarioConGrupo = usuario.copy(grupos = listOf(grupoId))
+                     usuarioVM.guardarUsuario(usuarioConGrupo,
                         onSuccess = onSuccess,
                         onFailure = { onFailure("Error al guardar usuario") }
                      )
@@ -162,4 +164,22 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
          onFailure = { onFailure("Error al guardar usuario") }
       )
    }
+   fun unirseAGrupoPorNombre(
+      nombreGrupo: String,
+      uid: String,
+      usuario: Usuario,
+      onSuccess: () -> Unit,
+      onFailure: (String) -> Unit
+   ) {
+      grupoVM.obtenerGrupoPorNombre(nombreGrupo) { grupo ->
+         if (grupo == null) {
+            onFailure("No se encontró ningún grupo con ese nombre")
+         } else {
+            val usuarioConGrupo = usuario.copy(grupos = listOf(grupo.grupoFamiliarId))
+            unirseAGrupoYGuardarUsuario(grupo.grupoFamiliarId, uid, usuarioConGrupo, onSuccess, onFailure)
+         }
+      }
+   }
+
+
 }

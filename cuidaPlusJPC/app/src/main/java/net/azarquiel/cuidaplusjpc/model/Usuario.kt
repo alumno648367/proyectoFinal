@@ -5,5 +5,7 @@ data class Usuario(
     var nombre: String = "",
     var fechaNacimiento: Date = Date(),  // tipo Date real
     var email: String = "",
-    var numTelefono: Long = 0L
+    var numTelefono: Long = 0L,
+    var grupos: List<String> = emptyList()
+
 )
