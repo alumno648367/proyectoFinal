@@ -151,7 +151,9 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
                     viewModel.loginConEmail(email, password,
                         onSuccess = {
                             Toast.makeText(context, "Sesión iniciada", Toast.LENGTH_SHORT).show()
-                             navController.navigate(AppScreens.MiCuentaScreen.route)
+                            navController.navigate(AppScreens.MainScreen.route)
+
+                            //navController.navigate(AppScreens.MiCuentaScreen.route)
                         },
                         onFailure = {
                             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
