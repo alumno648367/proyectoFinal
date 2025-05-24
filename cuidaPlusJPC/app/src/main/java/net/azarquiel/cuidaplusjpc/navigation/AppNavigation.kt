@@ -36,8 +36,6 @@ fun AppNavigation(viewModel: MainViewModel) {
         composable(AppScreens.MainScreen.route) {
             MainScreen(viewModel)
         }
-
-
     }
 }
 sealed class AppScreens(val route: String) {

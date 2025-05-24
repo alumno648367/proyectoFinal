@@ -9,14 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.google.firebase.auth.FirebaseAuth
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
@@ -27,7 +25,7 @@ fun MiCuentaScreen(
     viewModel: MainViewModel
 ) {
     Scaffold(
-        topBar = { MiCuentaTopBar(viewModel, navController) },
+        topBar = { MiCuentaTopBar(viewModel) },
         containerColor = colorResource(R.color.fondo_claro),
         content = { padding ->
             MiCuentaContent(padding, navController, viewModel)
@@ -37,10 +35,8 @@ fun MiCuentaScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MiCuentaTopBar(viewModel: MainViewModel, navController: NavHostController) {
+fun MiCuentaTopBar(viewModel: MainViewModel) {
     val usuario = viewModel.usuarioVM.usuario.observeAsState()
-    val context = LocalContext.current
-
     TopAppBar(
         title = {
             Row(
@@ -54,25 +50,11 @@ fun MiCuentaTopBar(viewModel: MainViewModel, navController: NavHostController) {
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = usuario.value?.nombre ?: "",
-                        fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    TextButton(onClick = {
-                        FirebaseAuth.getInstance().signOut()
-                        navController.navigate("LoginUsuarioScreen") {
-                            popUpTo(0) // Limpia el historial de navegación
-                        }
-                    }) {
-                        Text(
-                            text = "Salir",
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                }
+                Text(
+                    text = usuario.value?.nombre ?: "",
+                    fontSize = 16.sp,
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
