@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.google.firebase.auth.FirebaseAuth
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
@@ -122,6 +123,24 @@ fun MiCuentaContent(
             ) {
                 Text("Unirse a nuevo grupo", fontSize = 16.sp)
             }
+            Button(
+                onClick = {
+                    FirebaseAuth.getInstance().signOut()
+                    navController.navigate("LoginUsuarioScreen") {
+                        popUpTo(0)
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorResource(R.color.primario),
+                    contentColor = colorResource(R.color.texto_principal)
+                )
+            ) {
+                Text("Cerrar sesión", fontSize = 16.sp)
+            }
+
         }
     } ?: run {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
