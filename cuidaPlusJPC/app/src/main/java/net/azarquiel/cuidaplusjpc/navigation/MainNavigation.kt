@@ -36,5 +36,15 @@ fun MainNavigation(
         composable("addPaciente") {
             AddPacienteScreen(navController, viewModel, padding)
         }
+        composable("detailPaciente/{pacienteId}") { backStackEntry ->
+            val pacienteId = backStackEntry.arguments?.getString("pacienteId") ?: return@composable
+            PacienteDetailScreen(
+                pacienteId = pacienteId,
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
+
+
     }
 }

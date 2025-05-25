@@ -1,6 +1,7 @@
 package net.azarquiel.cuidaplusjpc.screens
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
@@ -107,7 +108,7 @@ fun PacientesScreenContent(
         }
 
         items(pacientesFiltrados) { paciente ->
-            PacienteDetailCard(paciente)
+            PacienteDetailCard(paciente, navController)
         }
 
         item {
@@ -118,9 +119,13 @@ fun PacientesScreenContent(
 
 @SuppressLint("SimpleDateFormat")
 @Composable
-fun PacienteDetailCard(paciente: Paciente) {
+fun PacienteDetailCard(paciente: Paciente, navController: NavHostController) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable {
+                navController.navigate("detailPaciente/${paciente.pacienteId}")
+            },
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White)

@@ -9,6 +9,7 @@ data class Paciente(
     var nombreCompleto: String = "",
     var fechaNacimiento: Date = Date(),
     var direccion: String = "",
+    var enfermedades: List<String> = emptyList() // IDs de enfermedades
     //var archivosAdjuntos: List<String> = emptyList(), // Lista de IDs o URLs si los tienes fuera
 
 )

@@ -22,7 +22,6 @@ class PacienteViewModel : ViewModel() {
             _pacientes.value = lista
         }
     }
-
     /**
      * Guarda un nuevo paciente en Firestore
      */
@@ -32,6 +31,13 @@ class PacienteViewModel : ViewModel() {
         onFailure: (Exception) -> Unit
     ) {
         repo.guardarPaciente(paciente, onSuccess, onFailure)
+    }
+
+    fun escucharPaciente(
+        pacienteId: String,
+        onChange: (Paciente?) -> Unit
+    ) {
+        repo.escucharPaciente(pacienteId, onChange)
     }
 
     /**
