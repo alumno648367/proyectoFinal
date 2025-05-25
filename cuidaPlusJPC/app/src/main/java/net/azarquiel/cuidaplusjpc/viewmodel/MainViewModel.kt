@@ -1,11 +1,14 @@
 package net.azarquiel.cuidaplusjpc.viewmodel
 
 import Usuario
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import net.azarquiel.cuidaplusjpc.model.GrupoFamiliar
+import net.azarquiel.cuidaplusjpc.utils.cargarEnfermedadesDesdeAssets
 import net.azarquiel.cuidaplusjpc.view.MainActivity
 
 class MainViewModel(mainActivity: MainActivity) : ViewModel() {
@@ -38,7 +41,7 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
             usuarioVM.usuario.observeForever { usuario ->
                val grupoId = usuario?.grupos?.firstOrNull()
                if (!grupoId.isNullOrEmpty()) {
-                  grupoVM.cargarGrupo(grupoId)
+                  grupoVM.cargarGrupo(grupoId)  // ESTO trae el nombre desde Firestore
                }
             }
             onSuccess(uid)
@@ -185,6 +188,21 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
             val usuarioConGrupo = usuario.copy(grupos = listOf(grupo.grupoFamiliarId))
             unirseAGrupoYGuardarUsuario(grupo.grupoFamiliarId, uid, usuarioConGrupo, onSuccess, onFailure)
          }
+      }
+   }
+   fun subirEnfermedadesAFirebase(context: Context) {
+      val enfermedades = cargarEnfermedadesDesdeAssets(context)
+      val db = FirebaseFirestore.getInstance()
+      val col = db.collection("enfermedades")
+
+      for (enfermedad in enfermedades) {
+         col.document(enfermedad.enfermedadId).set(enfermedad)
+            .addOnSuccessListener {
+               Log.d("Firebase", "Subida: ${enfermedad.nombre}")
+            }
+            .addOnFailureListener {
+               Log.e("Firebase", "Error: ${it.message}")
+            }
       }
    }
 

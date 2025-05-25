@@ -1,0 +1,352 @@
+[
+  {
+    "enfermedadId": "1",
+    "nombre": "Hipertensión arterial",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "2",
+    "nombre": "Enfermedad coronaria",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "3",
+    "nombre": "Infarto de miocardio",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "4",
+    "nombre": "Insuficiencia cardíaca",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "5",
+    "nombre": "Arritmias",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "6",
+    "nombre": "Accidente cerebrovascular (ictus)",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "7",
+    "nombre": "Aneurisma",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "8",
+    "nombre": "Arteriosclerosis",
+    "categoria": "Enfermedades cardiovasculares"
+  },
+  {
+    "enfermedadId": "9",
+    "nombre": "Epilepsia",
+    "categoria": "Enfermedades neurológicas"
+  },
+  {
+    "enfermedadId": "10",
+    "nombre": "Parkinson",
+    "categoria": "Enfermedades neurológicas"
+  },
+  {
+    "enfermedadId": "11",
+    "nombre": "Alzheimer",
+    "categoria": "Enfermedades neurológicas"
+  },
+  {
+    "enfermedadId": "12",
+    "nombre": "Esclerosis múltiple",
+    "categoria": "Enfermedades neurológicas"
+  },
+  {
+    "enfermedadId": "13",
+    "nombre": "Migraña",
+    "categoria": "Enfermedades neurológicas"
+  },
+  {
+    "enfermedadId": "14",
+    "nombre": "Neuralgia del trigémino",
+    "categoria": "Enfermedades neurológicas"
+  },
+  {
+    "enfermedadId": "15",
+    "nombre": "Esclerosis lateral amiotrófica (ELA)",
+    "categoria": "Enfermedades neurológicas"
+  },
+  {
+    "enfermedadId": "16",
+    "nombre": "Asma",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "17",
+    "nombre": "Bronquitis crónica",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "18",
+    "nombre": "EPOC (Enfermedad Pulmonar Obstructiva Crónica)",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "19",
+    "nombre": "Neumonía",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "20",
+    "nombre": "Gripe",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "21",
+    "nombre": "COVID-19",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "22",
+    "nombre": "Tuberculosis",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "23",
+    "nombre": "Rinitis alérgica",
+    "categoria": "Enfermedades respiratorias"
+  },
+  {
+    "enfermedadId": "24",
+    "nombre": "Diabetes tipo 1",
+    "categoria": "Enfermedades metabólicas y endocrinas"
+  },
+  {
+    "enfermedadId": "25",
+    "nombre": "Diabetes tipo 2",
+    "categoria": "Enfermedades metabólicas y endocrinas"
+  },
+  {
+    "enfermedadId": "26",
+    "nombre": "Hipotiroidismo",
+    "categoria": "Enfermedades metabólicas y endocrinas"
+  },
+  {
+    "enfermedadId": "27",
+    "nombre": "Hipertiroidismo",
+    "categoria": "Enfermedades metabólicas y endocrinas"
+  },
+  {
+    "enfermedadId": "28",
+    "nombre": "Obesidad",
+    "categoria": "Enfermedades metabólicas y endocrinas"
+  },
+  {
+    "enfermedadId": "29",
+    "nombre": "Síndrome metabólico",
+    "categoria": "Enfermedades metabólicas y endocrinas"
+  },
+  {
+    "enfermedadId": "30",
+    "nombre": "Dislipidemia (colesterol alto)",
+    "categoria": "Enfermedades metabólicas y endocrinas"
+  },
+  {
+    "enfermedadId": "31",
+    "nombre": "Lupus eritematoso sistémico",
+    "categoria": "Enfermedades autoinmunes"
+  },
+  {
+    "enfermedadId": "32",
+    "nombre": "Artritis reumatoide",
+    "categoria": "Enfermedades autoinmunes"
+  },
+  {
+    "enfermedadId": "33",
+    "nombre": "Esclerosis múltiple",
+    "categoria": "Enfermedades autoinmunes"
+  },
+  {
+    "enfermedadId": "34",
+    "nombre": "Enfermedad de Crohn",
+    "categoria": "Enfermedades autoinmunes"
+  },
+  {
+    "enfermedadId": "35",
+    "nombre": "Colitis ulcerosa",
+    "categoria": "Enfermedades autoinmunes"
+  },
+  {
+    "enfermedadId": "36",
+    "nombre": "Psoriasis",
+    "categoria": "Enfermedades autoinmunes"
+  },
+  {
+    "enfermedadId": "37",
+    "nombre": "Tiroiditis de Hashimoto",
+    "categoria": "Enfermedades autoinmunes"
+  },
+  {
+    "enfermedadId": "38",
+    "nombre": "Depresión",
+    "categoria": "Trastornos mentales y del comportamiento"
+  },
+  {
+    "enfermedadId": "39",
+    "nombre": "Trastorno de ansiedad generalizada",
+    "categoria": "Trastornos mentales y del comportamiento"
+  },
+  {
+    "enfermedadId": "40",
+    "nombre": "Trastorno bipolar",
+    "categoria": "Trastornos mentales y del comportamiento"
+  },
+  {
+    "enfermedadId": "41",
+    "nombre": "Esquizofrenia",
+    "categoria": "Trastornos mentales y del comportamiento"
+  },
+  {
+    "enfermedadId": "42",
+    "nombre": "Trastorno obsesivo-compulsivo (TOC)",
+    "categoria": "Trastornos mentales y del comportamiento"
+  },
+  {
+    "enfermedadId": "43",
+    "nombre": "Trastorno por déficit de atención e hiperactividad (TDAH)",
+    "categoria": "Trastornos mentales y del comportamiento"
+  },
+  {
+    "enfermedadId": "44",
+    "nombre": "VIH/SIDA",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "45",
+    "nombre": "Hepatitis B",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "46",
+    "nombre": "Hepatitis C",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "47",
+    "nombre": "Dengue",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "48",
+    "nombre": "Zika",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "49",
+    "nombre": "Malaria",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "50",
+    "nombre": "Varicela",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "51",
+    "nombre": "Sarampión",
+    "categoria": "Enfermedades infecciosas"
+  },
+  {
+    "enfermedadId": "52",
+    "nombre": "Síndrome de Down",
+    "categoria": "Enfermedades genéticas y raras"
+  },
+  {
+    "enfermedadId": "53",
+    "nombre": "Fibrosis quística",
+    "categoria": "Enfermedades genéticas y raras"
+  },
+  {
+    "enfermedadId": "54",
+    "nombre": "Distrofia muscular",
+    "categoria": "Enfermedades genéticas y raras"
+  },
+  {
+    "enfermedadId": "55",
+    "nombre": "Hemofilia",
+    "categoria": "Enfermedades genéticas y raras"
+  },
+  {
+    "enfermedadId": "56",
+    "nombre": "Enfermedad de Huntington",
+    "categoria": "Enfermedades genéticas y raras"
+  },
+  {
+    "enfermedadId": "57",
+    "nombre": "Enfermedad de Wilson",
+    "categoria": "Enfermedades genéticas y raras"
+  },
+  {
+    "enfermedadId": "58",
+    "nombre": "Anemia falciforme",
+    "categoria": "Enfermedades genéticas y raras"
+  },
+  {
+    "enfermedadId": "59",
+    "nombre": "Gastritis",
+    "categoria": "Enfermedades del sistema digestivo"
+  },
+  {
+    "enfermedadId": "60",
+    "nombre": "Úlcera péptica",
+    "categoria": "Enfermedades del sistema digestivo"
+  },
+  {
+    "enfermedadId": "61",
+    "nombre": "Reflujo gastroesofágico",
+    "categoria": "Enfermedades del sistema digestivo"
+  },
+  {
+    "enfermedadId": "62",
+    "nombre": "Síndrome del intestino irritable",
+    "categoria": "Enfermedades del sistema digestivo"
+  },
+  {
+    "enfermedadId": "63",
+    "nombre": "Enfermedad celíaca",
+    "categoria": "Enfermedades del sistema digestivo"
+  },
+  {
+    "enfermedadId": "64",
+    "nombre": "Hepatitis",
+    "categoria": "Enfermedades del sistema digestivo"
+  },
+  {
+    "enfermedadId": "65",
+    "nombre": "Cirrosis",
+    "categoria": "Enfermedades del sistema digestivo"
+  },
+  {
+    "enfermedadId": "66",
+    "nombre": "Infección del tracto urinario",
+    "categoria": "Enfermedades del sistema urinario"
+  },
+  {
+    "enfermedadId": "67",
+    "nombre": "Cistitis",
+    "categoria": "Enfermedades del sistema urinario"
+  },
+  {
+    "enfermedadId": "68",
+    "nombre": "Nefritis",
+    "categoria": "Enfermedades del sistema urinario"
+  },
+  {
+    "enfermedadId": "69",
+    "nombre": "Insuficiencia renal",
+    "categoria": "Enfermedades del sistema urinario"
+  },
+  {
+    "enfermedadId": "70",
+    "nombre": "Cálculos renales",
+    "categoria": "Enfermedades del sistema urinario"
+  }
+]

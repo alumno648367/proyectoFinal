@@ -7,7 +7,6 @@ import androidx.navigation.compose.rememberNavController
 import net.azarquiel.cuidaplusjpc.screens.HomeScreen
 import net.azarquiel.cuidaplusjpc.screens.LoginUsuarioScreen
 import net.azarquiel.cuidaplusjpc.screens.MainScreen
-import net.azarquiel.cuidaplusjpc.screens.MiCuentaScreen
 import net.azarquiel.cuidaplusjpc.screens.RegisterCompletoScreen
 import net.azarquiel.cuidaplusjpc.screens.RegisterUsuarioScreen
 import net.azarquiel.cuidaplusjpc.screens.SplashScreen

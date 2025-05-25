@@ -16,6 +16,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val viewModel = MainViewModel(this)
+        //viewModel.subirEnfermedadesAFirebase(this)
         setContent {
             CuidaPlusJPCTheme {
                 AppNavigation(viewModel)
@@ -23,4 +24,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

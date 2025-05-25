@@ -33,5 +33,8 @@ fun MainNavigation(
         composable("pacientes") {
             PacientesScreen(navController, viewModel, padding)
         }
+        composable("addPaciente") {
+            AddPacienteScreen(navController, viewModel, padding)
+        }
     }
 }

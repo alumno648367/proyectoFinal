@@ -53,20 +53,20 @@ class PacienteRepository {
      * Obtiene la lista de pacientes que pertenecen a un grupo familiar
      * - Se filtra por grupoFamiliarId
      */
-    fun obtenerPacientesPorGrupo(
-        grupoId: String,
-        onResult: (List<Paciente>) -> Unit
-    ) {
-        ref.whereEqualTo("grupoFamiliarId", grupoId)
-            .get()
-            .addOnSuccessListener { result ->
-                val lista = result.mapNotNull { it.toObject<Paciente>() }
+    fun obtenerPacientesPorGrupo(grupoId: String, onResult: (List<Paciente>) -> Unit) {
+        db.collection("pacientes")
+            .whereEqualTo("grupoFamiliarId", grupoId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) {
+                    onResult(emptyList())
+                    return@addSnapshotListener
+                }
+
+                val lista = snapshot.toObjects(Paciente::class.java)
                 onResult(lista)
             }
-            .addOnFailureListener {
-                onResult(emptyList())
-            }
     }
+
 
     /**
      * Actualiza campos específicos del documento del paciente

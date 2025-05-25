@@ -6,7 +6,9 @@ data class Paciente(
     var pacienteId: String = "",               // ID único
     var grupoFamiliarId: String = "",
     var nombreGrupo: String = "",// A qué grupo pertenece
-    var nombre: String = "",
+    var nombreCompleto: String = "",
     var fechaNacimiento: Date = Date(),
-    var archivosAdjuntos: List<String> = emptyList()  // Lista de IDs o URLs si los tienes fuera
+    var direccion: String = "",
+    //var archivosAdjuntos: List<String> = emptyList(), // Lista de IDs o URLs si los tienes fuera
+
 )
