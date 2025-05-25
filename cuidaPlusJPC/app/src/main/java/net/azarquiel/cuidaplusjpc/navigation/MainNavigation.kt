@@ -16,13 +16,13 @@ fun MainNavigation(
 ) {
     NavHost(
         navController = navController,
-        startDestination = "perfil"
+        startDestination = "inicio"
     ) {
-        composable("perfil") {
+        composable("inicio") {
             MiCuentaScreen(navController, viewModel)
         }
-        composable("inicio") {
-            InicioScreen(navController, viewModel)
+        composable("perfil") {
+            PerfilScreen(navController, viewModel)
         }
         composable("grupo") {
             GrupoScreen(navController, viewModel)
@@ -31,10 +31,7 @@ fun MainNavigation(
             CitasScreen(navController, viewModel)
         }
         composable("pacientes") {
-            PacientesScreen(navController, viewModel)
-        }
-        composable("notificaciones") {
-            NotificacionesScreen(navController, viewModel)
+            PacientesScreen(navController, viewModel, padding)
         }
     }
 }

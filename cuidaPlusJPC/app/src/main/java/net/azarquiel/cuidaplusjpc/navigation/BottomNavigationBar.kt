@@ -12,9 +12,9 @@ fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         BottomNavItem.Perfil,
         BottomNavItem.Grupo,
+        BottomNavItem.Inicio,
         BottomNavItem.Pacientes,
-        BottomNavItem.Citas,
-        BottomNavItem.Notificaciones
+        BottomNavItem.Citas
     )
     NavigationBar(containerColor = colorResource(R.color.primario)) {
         val navBackStackEntry = navController.currentBackStackEntryAsState()

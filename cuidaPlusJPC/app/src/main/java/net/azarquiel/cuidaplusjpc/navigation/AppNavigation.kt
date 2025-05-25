@@ -34,9 +34,6 @@ fun AppNavigation(viewModel: MainViewModel) {
         composable(AppScreens.LoginUsuarioScreen.route){
             LoginUsuarioScreen(navController, viewModel)
         }
-        composable(AppScreens.MiCuentaScreen.route){
-            MiCuentaScreen(navController, viewModel)
-        }
         composable(AppScreens.MainScreen.route) {
             MainScreen(viewModel)
         }
@@ -48,7 +45,6 @@ sealed class AppScreens(val route: String) {
     object RegisterUsuarioScreen: AppScreens(route = "RegisterUsuarioScreen")
     object RegisterCompletoScreen: AppScreens(route = "RegisterCompletoScreen")
     object LoginUsuarioScreen: AppScreens(route = "LoginUsuarioScreen")
-    object MiCuentaScreen: AppScreens(route = "MiCuentaScreen")
     object MainScreen: AppScreens(route = "MainScreen")
 
 }

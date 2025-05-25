@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import net.azarquiel.cuidaplusjpc.R
+import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
 
@@ -126,8 +127,8 @@ fun MiCuentaContent(
             Button(
                 onClick = {
                     FirebaseAuth.getInstance().signOut()
-                    navController.navigate("LoginUsuarioScreen") {
-                        popUpTo(0)
+                    navController.navigate(AppScreens.HomeScreen.route) {
+                        popUpTo(0) // limpia todo el backstack
                     }
                 },
                 modifier = Modifier

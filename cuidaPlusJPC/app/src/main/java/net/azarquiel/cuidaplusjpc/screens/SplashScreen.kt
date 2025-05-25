@@ -19,25 +19,41 @@ import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
 @Composable
 fun SplashScreen(navController: NavHostController, viewModel: MainViewModel) {
-
-    // Retraso para mostrar la pantalla y luego navegar
+    // Retraso para simular splash y comprobar usuario
     Handler(Looper.getMainLooper()).postDelayed({
         val currentUser = FirebaseAuth.getInstance().currentUser
         if (currentUser != null) {
             val uid = currentUser.uid
-            viewModel.usuarioVM.empezarEscucha(uid)
-            navController.navigate(AppScreens.MainScreen.route) {
-                popUpTo(0)
-            }
+
+            // Verificar si el documento del usuario existe
+            viewModel.db.collection("usuarios").document(uid).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        viewModel.usuarioVM.empezarEscucha(uid)
+                        navController.navigate(AppScreens.MainScreen.route) {
+                            popUpTo(0)
+                        }
+                    } else {
+                        // Usuario autenticado pero sin documento → eliminar cuenta
+                        currentUser.delete()
+                            .addOnCompleteListener {
+                                FirebaseAuth.getInstance().signOut()
+                                navController.navigate(AppScreens.HomeScreen.route) {
+                                    popUpTo(0)
+                                }
+                            }
+                    }
+
+                }
         } else {
+            // No logueado → ir al inicio
             navController.navigate(AppScreens.HomeScreen.route) {
                 popUpTo(0)
             }
         }
     }, 1000)
 
-
-    // UI de la pantalla de inicio
+    // Pantalla visual
     Box(
         modifier = Modifier
             .fillMaxSize()

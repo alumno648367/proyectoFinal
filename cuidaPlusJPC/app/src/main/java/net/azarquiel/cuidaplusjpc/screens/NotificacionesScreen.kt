@@ -5,8 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
-
 @Composable
-fun GrupoScreen(navController: NavHostController, viewModel: MainViewModel) {
-    Text("Pantalla Grupo")
+fun NotificacionesScreen(navController: NavHostController, viewModel: MainViewModel) {
+    Text("Pantalla Notificaciones")
 }

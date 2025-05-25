@@ -5,7 +5,6 @@ import androidx.compose.material.icons.filled.Event
 import androidx.compose.material.icons.filled.Group
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.ui.graphics.vector.ImageVector
 
@@ -19,6 +18,4 @@ sealed class BottomNavItem(val title: String, val route: String, val icon: Image
     object Pacientes : BottomNavItem("Pacientes", "pacientes", Icons.Filled.MedicalServices)
 
     object Citas : BottomNavItem("Citas", "citas", Icons.Filled.Event)
-
-    object Notificaciones : BottomNavItem("Notificaciones", "Notificaciones", Icons.Filled.Notifications)
 }

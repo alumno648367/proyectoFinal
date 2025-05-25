@@ -34,6 +34,13 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
          .addOnSuccessListener {
             val uid = it.user?.uid ?: ""
             usuarioVM.empezarEscucha(uid)
+            // Cargar grupo automáticamente al detectar el usuario
+            usuarioVM.usuario.observeForever { usuario ->
+               val grupoId = usuario?.grupos?.firstOrNull()
+               if (!grupoId.isNullOrEmpty()) {
+                  grupoVM.cargarGrupo(grupoId)
+               }
+            }
             onSuccess(uid)
          }
          .addOnFailureListener {

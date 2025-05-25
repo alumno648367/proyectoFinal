@@ -12,7 +12,8 @@ class GrupoFamiliarViewModel : ViewModel() {
     private val repo = GrupoFamiliarRepository()
 
     // LiveData con el grupo actualmente cargado o escuchado
-    val grupo = MutableLiveData<GrupoFamiliar?>()
+    private val _grupo = MutableLiveData<GrupoFamiliar?>()
+    val grupo: MutableLiveData<GrupoFamiliar?> = _grupo
 
     /**
      * Crea un nuevo grupo familiar en Firestore
@@ -32,7 +33,7 @@ class GrupoFamiliarViewModel : ViewModel() {
      */
     fun cargarGrupo(grupoId: String) {
         repo.obtenerGrupo(grupoId) {
-            grupo.value = it
+            _grupo.value = it
         }
     }
 
@@ -78,12 +79,13 @@ class GrupoFamiliarViewModel : ViewModel() {
      */
     fun escucharGrupo(grupoId: String) {
         repo.escucharGrupo(grupoId) {
-            grupo.value = it
+            _grupo.value = it
         }
     }
     fun obtenerGrupoPorNombre(nombre: String, onResult: (GrupoFamiliar?) -> Unit) {
         repo.obtenerGrupoPorNombre(nombre, onResult)
     }
+
 
 
 

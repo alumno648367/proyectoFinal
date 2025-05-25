@@ -7,6 +7,6 @@ import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
 
 @Composable
-fun GrupoScreen(navController: NavHostController, viewModel: MainViewModel) {
-    Text("Pantalla Grupo")
+fun CitasScreen(navController: NavHostController, viewModel: MainViewModel) {
+    Text("Pantalla Citas")
 }
