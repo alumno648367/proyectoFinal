@@ -147,7 +147,7 @@ fun PacienteDetailScreenContent(
                         Button(
                             onClick = {
                                 // Navegar a pantalla de gestión de enfermedades
-                                // navController.navigate("gestionarEnfermedades/${paciente.pacienteId}")
+                                 //navController.navigate("gestionarEnfermedades/${paciente.pacienteId}")
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
                         ) {
