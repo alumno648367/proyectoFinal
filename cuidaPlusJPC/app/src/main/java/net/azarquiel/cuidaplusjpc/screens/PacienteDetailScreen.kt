@@ -1,5 +1,6 @@
 package net.azarquiel.cuidaplusjpc.screens
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,6 +64,7 @@ fun PacienteDetailScreen(
     }
 }
 
+@SuppressLint("SimpleDateFormat")
 @Composable
 fun PacienteDetailScreenContent(
     paciente: Paciente,
@@ -70,6 +72,7 @@ fun PacienteDetailScreenContent(
     viewModel: MainViewModel
 ) {
     var expandedEnfermedades by remember { mutableStateOf(true) } // abierto por defecto
+    val context = LocalContext.current
     var showDialogPaciente by remember { mutableStateOf(false) }
 
     LazyColumn(
@@ -153,25 +156,6 @@ fun PacienteDetailScreenContent(
                     }
                 }
             }
-            if (showDialogPaciente) {
-                EditarPacienteDialog(
-                    paciente = paciente,
-                    onDismiss = { showDialogPaciente = false },
-                    onGuardar = { editado ->
-                        viewModel.pacienteVM.guardarPaciente(
-                            editado,
-                            onSuccess = {
-                                Toast.makeText(context, "Datos actualizados", Toast.LENGTH_SHORT).show()
-                                showDialogPaciente = false
-                            },
-                            onFailure = {
-                                Toast.makeText(context, "Error al guardar", Toast.LENGTH_SHORT).show()
-                            }
-                        )
-                    }
-                )
-            }
-
         }
 
         // Secciones aún no implementadas
@@ -195,6 +179,24 @@ fun PacienteDetailScreenContent(
         }
 
         item { Spacer(modifier = Modifier.height(80.dp)) }
+    }
+    if (showDialogPaciente) {
+        EditarPacienteDialog(
+            paciente = paciente,
+            onDismiss = { showDialogPaciente = false },
+            onGuardar = { editado ->
+                viewModel.pacienteVM.guardarPaciente(
+                    editado,
+                    onSuccess = {
+                        Toast.makeText(context, "Datos actualizados", Toast.LENGTH_SHORT).show()
+                        showDialogPaciente = false
+                    },
+                    onFailure = {
+                        Toast.makeText(context, "Error al guardar", Toast.LENGTH_SHORT).show()
+                    }
+                )
+            }
+        )
     }
 }
 @Composable
@@ -230,12 +232,12 @@ fun EditarPacienteDialog(
             TextButton(
                 onClick = {
                     if (nombre.isBlank() || direccion.isBlank() || fechaDate == null) return@TextButton
-                    val editado = paciente.copy(
+                    val pacienteEditado = paciente.copy(
                         nombreCompleto = nombre,
                         direccion = direccion,
                         fechaNacimiento = fechaDate!!
                     )
-                    onGuardar(editado)
+                    onGuardar(pacienteEditado)
                 }
             ) {
                 Text("Guardar", fontSize = 16.sp)
