@@ -17,6 +17,8 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
    val usuarioVM = UsuarioViewModel()
    val grupoVM = GrupoFamiliarViewModel()
    val pacienteVM = PacienteViewModel()
+   val enfermedadVM = EnfermedadViewModel()
+   val enfermedadPacienteVM = EnfermedadPacienteViewModel()
 
    // Instancias únicas de FirebaseAuth y Firestore
    val auth = FirebaseAuth.getInstance()

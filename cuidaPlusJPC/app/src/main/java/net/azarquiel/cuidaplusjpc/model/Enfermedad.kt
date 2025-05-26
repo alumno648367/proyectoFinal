@@ -1,7 +1,7 @@
 package net.azarquiel.cuidaplusjpc.model
 
 data class Enfermedad(
-    var enfermedadId: String = "",   // ID único
+    var enfermedadId: String = "",
     var nombre: String = "",
     var categoria: String = ""
 )

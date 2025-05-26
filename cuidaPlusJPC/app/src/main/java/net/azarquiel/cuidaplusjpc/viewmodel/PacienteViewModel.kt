@@ -3,12 +3,14 @@ package net.azarquiel.cuidaplusjpc.viewmodel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import net.azarquiel.cuidaplusjpc.model.Paciente
+import net.azarquiel.cuidaplusjpc.repository.EnfermedadPacienteRepository
 import net.azarquiel.cuidaplusjpc.repository.PacienteRepository
 
 class PacienteViewModel : ViewModel() {
 
     // Repositorio encargado de acceder a Firebase Firestore
     private val repo = PacienteRepository()
+    private val repoEnfermedadPaciente = EnfermedadPacienteRepository()
 
     // LiveData con la lista de pacientes del grupo
     private val _pacientes = MutableLiveData<List<Paciente>>()
@@ -22,6 +24,7 @@ class PacienteViewModel : ViewModel() {
             _pacientes.value = lista
         }
     }
+
     /**
      * Guarda un nuevo paciente en Firestore
      */
@@ -61,5 +64,20 @@ class PacienteViewModel : ViewModel() {
         onFailure: (Exception) -> Unit
     ) {
         repo.eliminarPaciente(pacienteId, onSuccess, onFailure)
+    }
+
+    /**
+     * Actualiza el campo enfermedades con los IDs actuales del paciente
+     */
+    fun actualizarEnfermedadesDelPaciente(pacienteId: String) {
+        repoEnfermedadPaciente.enfermedadPorPaciente(pacienteId) { relaciones ->
+            val listaIds = relaciones.map { it.enfermedadId }
+            actualizarPaciente(
+                pacienteId,
+                mapOf("enfermedades" to listaIds),
+                onSuccess = {},
+                onFailure = {}
+            )
+        }
     }
 }

@@ -19,4 +19,5 @@ class EnfermedadRepository {
                 onResult(lista)
             }
     }
+
 }

@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Group
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,8 +24,7 @@ import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.model.Paciente
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +35,6 @@ fun PacienteDetailScreen(
 ) {
     var paciente by remember { mutableStateOf<Paciente?>(null) }
 
-    // Escucha el paciente
     LaunchedEffect(pacienteId) {
         viewModel.pacienteVM.escucharPaciente(pacienteId) {
             paciente = it
@@ -57,10 +52,11 @@ fun PacienteDetailScreen(
         },
         containerColor = colorResource(R.color.fondo_claro)
     ) { padding ->
-        paciente?.let { PacienteDetailScreenContent(it, padding, viewModel) }
-            ?: Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-                CircularProgressIndicator(modifier = Modifier.align(alignment = androidx.compose.ui.Alignment.Center))
-            }
+        paciente?.let {
+            PacienteDetailScreenContent(it, padding, viewModel, navController)
+        } ?: Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
 
@@ -69,11 +65,18 @@ fun PacienteDetailScreen(
 fun PacienteDetailScreenContent(
     paciente: Paciente,
     padding: PaddingValues,
-    viewModel: MainViewModel
+    viewModel: MainViewModel,
+    navController: NavHostController
 ) {
-    var expandedEnfermedades by remember { mutableStateOf(true) } // abierto por defecto
-    val context = LocalContext.current
+    var expandedEnfermedades by remember { mutableStateOf(true) }
     var showDialogPaciente by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    val relaciones by viewModel.enfermedadPacienteVM.relaciones.observeAsState(emptyList())
+
+    LaunchedEffect(paciente.pacienteId) {
+        viewModel.enfermedadPacienteVM.cargarPorPaciente(paciente.pacienteId)
+    }
 
     LazyColumn(
         modifier = Modifier
@@ -83,12 +86,8 @@ fun PacienteDetailScreenContent(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         item {
-
-
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
                 shape = RoundedCornerShape(20.dp),
                 elevation = CardDefaults.cardElevation(6.dp),
                 colors = CardDefaults.cardColors(containerColor = colorResource(R.color.white))
@@ -98,15 +97,13 @@ fun PacienteDetailScreenContent(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     Text("Datos del paciente", style = MaterialTheme.typography.titleMedium)
-
                     Divider()
-
                     DatoConIcono(Icons.Default.Person, paciente.nombreCompleto)
                     DatoConIcono(Icons.Default.Home, paciente.direccion)
                     DatoConIcono(Icons.Default.Group, paciente.nombreGrupo)
                     DatoConIcono(
                         Icons.Default.CalendarToday,
-                        java.text.SimpleDateFormat("dd/MM/yyyy").format(paciente.fechaNacimiento)
+                        SimpleDateFormat("dd/MM/yyyy").format(paciente.fechaNacimiento)
                     )
                     Button(
                         onClick = { showDialogPaciente = true },
@@ -117,13 +114,11 @@ fun PacienteDetailScreenContent(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Editar", color = Color.White)
                     }
-
                 }
             }
         }
 
-
-        // Enfermedades (implementada)
+        // Enfermedades
         item {
             Card(
                 onClick = { expandedEnfermedades = !expandedEnfermedades },
@@ -135,19 +130,17 @@ fun PacienteDetailScreenContent(
                     Text("Enfermedades", style = MaterialTheme.typography.titleMedium)
                     if (expandedEnfermedades) {
                         Spacer(Modifier.height(8.dp))
-                        if (paciente.enfermedades.isEmpty()) {
+                        if (relaciones.isEmpty()) {
                             Text("No tiene enfermedades asignadas.")
                         } else {
-                            paciente.enfermedades.forEach { id ->
-                                Text("- $id") // Más adelante puedes mostrar el nombre real
+                            relaciones.forEach { ep ->
+                                Text("- ${ep.nombre} (${ep.categoria})")
                             }
                         }
-
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
                             onClick = {
-                                // Navegar a pantalla de gestión de enfermedades
-                                 //navController.navigate("gestionarEnfermedades/${paciente.pacienteId}")
+                                navController.navigate("gestionarEnfermedades/${paciente.pacienteId}")
                             },
                             colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
                         ) {
@@ -158,7 +151,7 @@ fun PacienteDetailScreenContent(
             }
         }
 
-        // Secciones aún no implementadas
+        // Secciones futuras
         val secciones = listOf("Tratamientos", "Medicación", "Citas médicas", "Historial clínico")
         items(secciones.size) { i ->
             var expanded by remember { mutableStateOf(false) }
@@ -180,6 +173,7 @@ fun PacienteDetailScreenContent(
 
         item { Spacer(modifier = Modifier.height(80.dp)) }
     }
+
     if (showDialogPaciente) {
         EditarPacienteDialog(
             paciente = paciente,
@@ -199,6 +193,7 @@ fun PacienteDetailScreenContent(
         )
     }
 }
+
 @Composable
 fun DatoConIcono(icon: ImageVector, texto: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -212,6 +207,7 @@ fun DatoConIcono(icon: ImageVector, texto: String) {
         Text(texto)
     }
 }
+
 @Composable
 fun EditarPacienteDialog(
     paciente: Paciente,

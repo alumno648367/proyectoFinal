@@ -1,5 +1,6 @@
 package net.azarquiel.cuidaplusjpc.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import net.azarquiel.cuidaplusjpc.model.Enfermedad
@@ -12,6 +13,13 @@ class EnfermedadViewModel : ViewModel() {
     val enfermedades: MutableLiveData<List<Enfermedad>> = _enfermedades
 
     fun cargarEnfermedades() {
-        repo.obtenerEnfermedades { _enfermedades.value = it }
+        repo.obtenerEnfermedades { lista ->
+            Log.d("ENFERMEDADES", "Cargadas: ${lista.size}")
+
+            enfermedades.value = lista
+        }
     }
+
+
+
 }

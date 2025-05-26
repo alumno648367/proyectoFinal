@@ -5,9 +5,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,25 +17,48 @@ import androidx.navigation.NavHostController
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.model.Enfermedad
 import net.azarquiel.cuidaplusjpc.model.EnfermedadPaciente
+import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GestionarEnfermedadesScreen(
     pacienteId: String,
-    enfermedades: List<Enfermedad>,
-    enfermedadesAsignadas: List<EnfermedadPaciente>,
-    onGuardar: (EnfermedadPaciente) -> Unit,
-    onEliminar: (EnfermedadPaciente) -> Unit,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: MainViewModel
 ) {
-    var categoriaSeleccionada by remember { mutableStateOf("") }
+    LaunchedEffect(true) {
+        viewModel.enfermedadVM.cargarEnfermedades()
+        viewModel.enfermedadPacienteVM.cargarPorPaciente(pacienteId)
+    }
+
+    val enfermedades by viewModel.enfermedadVM.enfermedades.observeAsState(emptyList())
+    val relaciones by viewModel.enfermedadPacienteVM.relaciones.observeAsState(emptyList())
+
+    var categoriaSeleccionada by remember { mutableStateOf("-- Selecciona categoría --") }
     var enfermedadSeleccionada by remember { mutableStateOf<Enfermedad?>(null) }
     var estado by remember { mutableStateOf("Activa") }
     var observaciones by remember { mutableStateOf("") }
 
-    val categorias = enfermedades.map { it.categoria }.distinct()
-    val enfermedadesFiltradas = enfermedades.filter { it.categoria == categoriaSeleccionada }
+    val categorias = remember(enfermedades) {
+        listOf("-- Selecciona categoría --") + enfermedades.map { it.categoria.trim() }.distinct().sorted()
+    }
+
+    val enfermedadesFiltradas = remember(enfermedades, categoriaSeleccionada) {
+        if (categoriaSeleccionada == "-- Selecciona categoría --" || categoriaSeleccionada.isBlank()) {
+            emptyList()
+        } else {
+            enfermedades.filter {
+                it.categoria.trim().lowercase() == categoriaSeleccionada.trim().lowercase()
+            }
+        }
+    }
+
+    LaunchedEffect(enfermedades) {
+        if (enfermedades.isNotEmpty() && categoriaSeleccionada == "-- Selecciona categoría --") {
+            categoriaSeleccionada = enfermedades.first().categoria.trim()
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -53,24 +76,27 @@ fun GestionarEnfermedadesScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             // Dropdown categoría
+            var expandedCategoria by remember { mutableStateOf(false) }
+
             ExposedDropdownMenuBox(
-                expanded = false,
-                onExpandedChange = {}
+                expanded = expandedCategoria,
+                onExpandedChange = { expandedCategoria = !expandedCategoria }
             ) {
-                var expanded by remember { mutableStateOf(false) }
                 TextField(
                     value = categoriaSeleccionada,
                     onValueChange = {},
                     label = { Text("Categoría") },
                     readOnly = true,
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategoria)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    expanded = expandedCategoria,
+                    onDismissRequest = { expandedCategoria = false }
                 ) {
                     categorias.forEach { categoria ->
                         DropdownMenuItem(
@@ -78,7 +104,7 @@ fun GestionarEnfermedadesScreen(
                             onClick = {
                                 categoriaSeleccionada = categoria
                                 enfermedadSeleccionada = null
-                                expanded = false
+                                expandedCategoria = false
                             }
                         )
                     }
@@ -86,35 +112,42 @@ fun GestionarEnfermedadesScreen(
             }
 
             // Dropdown enfermedad
+            var expandedEnfermedad by remember { mutableStateOf(false) }
+
             ExposedDropdownMenuBox(
-                expanded = false,
-                onExpandedChange = {}
+                expanded = expandedEnfermedad,
+                onExpandedChange = { expandedEnfermedad = !expandedEnfermedad }
             ) {
-                var expanded by remember { mutableStateOf(false) }
                 TextField(
                     value = enfermedadSeleccionada?.nombre ?: "",
                     onValueChange = {},
                     label = { Text("Enfermedad") },
                     readOnly = true,
                     trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedEnfermedad)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .menuAnchor()
+                        .fillMaxWidth()
                 )
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    expanded = expandedEnfermedad,
+                    onDismissRequest = { expandedEnfermedad = false }
                 ) {
                     enfermedadesFiltradas.forEach { enfermedad ->
                         DropdownMenuItem(
                             text = { Text(enfermedad.nombre) },
                             onClick = {
                                 enfermedadSeleccionada = enfermedad
-                                expanded = false
+                                expandedEnfermedad = false
                             }
                         )
                     }
                 }
+            }
+
+            if (enfermedadesFiltradas.isEmpty() && categoriaSeleccionada != "-- Selecciona categoría --") {
+                Text("No hay enfermedades en esta categoría", color = Color.Gray)
             }
 
             OutlinedTextField(
@@ -138,13 +171,18 @@ fun GestionarEnfermedadesScreen(
                             enfermedadPacienteId = UUID.randomUUID().toString(),
                             pacienteId = pacienteId,
                             enfermedadId = it.enfermedadId,
+                            nombre = it.nombre,                     // GUARDAMOS NOMBRE
+                            categoria = it.categoria,               // GUARDAMOS CATEGORÍA
                             fechaDiagnostico = Date().toString(),
                             estado = estado,
                             observaciones = observaciones
                         )
-                        onGuardar(nuevaRelacion)
+
+                        viewModel.enfermedadPacienteVM.guardarRelacion(nuevaRelacion)
+                        viewModel.pacienteVM.actualizarEnfermedadesDelPaciente(pacienteId)
                     }
                 },
+                enabled = enfermedadSeleccionada != null,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
             ) {
@@ -156,17 +194,21 @@ fun GestionarEnfermedadesScreen(
             Text("Enfermedades asignadas", style = MaterialTheme.typography.titleMedium)
 
             LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(enfermedadesAsignadas) { ep ->
+                items(relaciones) { ep ->
                     Card(modifier = Modifier.fillMaxWidth()) {
                         Column(modifier = Modifier.padding(12.dp)) {
-                            Text("ID enfermedad: ${ep.enfermedadId}")
+                            Text("Enfermedad: ${ep.nombre}")
+                            Text("Categoría: ${ep.categoria}")
                             Text("Estado: ${ep.estado}")
                             Text("Observaciones: ${ep.observaciones}")
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.End
                             ) {
-                                IconButton(onClick = { onEliminar(ep) }) {
+                                IconButton(onClick = {
+                                    viewModel.enfermedadPacienteVM.eliminarRelacion(ep.enfermedadPacienteId)
+                                    viewModel.pacienteVM.actualizarEnfermedadesDelPaciente(pacienteId)
+                                }) {
                                     Icon(Icons.Default.Delete, contentDescription = "Eliminar")
                                 }
                             }
