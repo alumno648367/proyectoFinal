@@ -52,6 +52,16 @@ fun MainNavigation(
                 viewModel = viewModel
             )
         }
+        composable("gestionarTratamientos/{enfermedadPacienteId}") { backStackEntry ->
+            val enfermedadPacienteId = backStackEntry.arguments?.getString("enfermedadPacienteId") ?: return@composable
+            GestionarTratamientosScreen(
+                enfermedadPacienteId = enfermedadPacienteId,
+                navController = navController,
+                viewModel = viewModel
+            )
+        }
+
+
 
 
 

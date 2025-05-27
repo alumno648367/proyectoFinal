@@ -134,8 +134,41 @@ fun PacienteDetailScreenContent(
                             Text("No tiene enfermedades asignadas.")
                         } else {
                             relaciones.forEach { ep ->
-                                Text("- ${ep.nombre} (${ep.categoria})")
+                                Column(modifier = Modifier.padding(start = 8.dp, bottom = 12.dp)) {
+                                    Text("- ${ep.nombre} (${ep.categoria})", fontWeight = FontWeight.SemiBold)
+
+                                    // Cargar tratamientos
+                                    LaunchedEffect(ep.enfermedadPacienteId) {
+                                        viewModel.tratamientoVM.cargarTratamientos(ep.enfermedadPacienteId)
+                                    }
+
+                                    val tratamientos by viewModel.tratamientoVM.tratamientos.observeAsState(emptyList())
+                                    val tratamientosDeEsta = viewModel.tratamientoVM.tratamientosPorEnfermedad[ep.enfermedadPacienteId] ?: emptyList()
+
+                                    if (tratamientosDeEsta.isEmpty()) {
+                                        Text("  No tiene tratamientos asignados.", fontSize = 14.sp, color = Color.Gray)
+                                    } else {
+                                        tratamientosDeEsta.forEach { t ->
+                                            Text("  • ${t.nombre} (${t.tipo})", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
+                                        }
+                                    }
+
+                                    Spacer(modifier = Modifier.height(8.dp))
+
+                                    Button(
+                                        onClick = {
+                                            navController.navigate("gestionarTratamientos/${ep.enfermedadPacienteId}")
+                                        },
+                                        modifier = Modifier.align(Alignment.End),
+                                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
+                                    ) {
+                                        Text("Gestionar tratamientos", color = Color.White)
+                                    }
+
+                                    Divider(modifier = Modifier.padding(top = 12.dp))
+                                }
                             }
+
                         }
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(
@@ -151,8 +184,8 @@ fun PacienteDetailScreenContent(
             }
         }
 
-        // Secciones futuras
-        val secciones = listOf("Tratamientos", "Medicación", "Citas médicas", "Historial clínico")
+        // Secciones futuras que aún no están implementadas
+        val secciones = listOf("Citas médicas", "Historial clínico")
         items(secciones.size) { i ->
             var expanded by remember { mutableStateOf(false) }
             Card(
@@ -165,11 +198,12 @@ fun PacienteDetailScreenContent(
                     Text(secciones[i], style = MaterialTheme.typography.titleMedium)
                     if (expanded) {
                         Spacer(Modifier.height(8.dp))
-                        Text("No implementado")
+                        Text("En desarrollo", fontStyle = MaterialTheme.typography.bodySmall.fontStyle)
                     }
                 }
             }
         }
+
 
         item { Spacer(modifier = Modifier.height(80.dp)) }
     }

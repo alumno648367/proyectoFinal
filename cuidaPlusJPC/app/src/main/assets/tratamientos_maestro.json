@@ -1,0 +1,202 @@
+[
+  {
+    "tratamientoId": "TRA001",
+    "nombre": "Rehabilitación cardíaca",
+    "tipo": "No farmacológico"
+  },
+  {
+    "tratamientoId": "TRA002",
+    "nombre": "Control de presión arterial",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA003",
+    "nombre": "Terapia antitrombótica",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA004",
+    "nombre": "Reducción del colesterol",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA005",
+    "nombre": "Rehabilitación neurológica",
+    "tipo": "No farmacológico"
+  },
+  {
+    "tratamientoId": "TRA006",
+    "nombre": "Entrenamiento cognitivo",
+    "tipo": "Cognitivo"
+  },
+  {
+    "tratamientoId": "TRA007",
+    "nombre": "Control de crisis epilépticas",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA008",
+    "nombre": "Terapia de estimulación cerebral",
+    "tipo": "Complementario"
+  },
+  {
+    "tratamientoId": "TRA009",
+    "nombre": "Rehabilitación pulmonar",
+    "tipo": "No farmacológico"
+  },
+  {
+    "tratamientoId": "TRA010",
+    "nombre": "Terapia respiratoria",
+    "tipo": "No farmacológico"
+  },
+  {
+    "tratamientoId": "TRA011",
+    "nombre": "Control del asma",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA012",
+    "nombre": "Oxigenoterapia domiciliaria",
+    "tipo": "Complementario"
+  },
+  {
+    "tratamientoId": "TRA013",
+    "nombre": "Educación en diabetes",
+    "tipo": "Dietético"
+  },
+  {
+    "tratamientoId": "TRA014",
+    "nombre": "Control de glucosa",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA015",
+    "nombre": "Control del tiroides",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA016",
+    "nombre": "Pérdida de peso guiada",
+    "tipo": "Dietético"
+  },
+  {
+    "tratamientoId": "TRA017",
+    "nombre": "Inmunoterapia",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA018",
+    "nombre": "Tratamiento antiinflamatorio crónico",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA019",
+    "nombre": "Rehabilitación funcional",
+    "tipo": "No farmacológico"
+  },
+  {
+    "tratamientoId": "TRA020",
+    "nombre": "Manejo del dolor autoinmune",
+    "tipo": "Complementario"
+  },
+  {
+    "tratamientoId": "TRA021",
+    "nombre": "Psicoterapia cognitivo-conductual",
+    "tipo": "Psicológico"
+  },
+  {
+    "tratamientoId": "TRA022",
+    "nombre": "Terapia ocupacional mental",
+    "tipo": "Psicológico"
+  },
+  {
+    "tratamientoId": "TRA023",
+    "nombre": "Terapia farmacológica psiquiátrica",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA024",
+    "nombre": "Entrenamiento emocional",
+    "tipo": "Psicológico"
+  },
+  {
+    "tratamientoId": "TRA025",
+    "nombre": "Terapia antiviral",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA026",
+    "nombre": "Tratamiento antibiótico prolongado",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA027",
+    "nombre": "Educación sobre prevención",
+    "tipo": "Psicológico"
+  },
+  {
+    "tratamientoId": "TRA028",
+    "nombre": "Reforzamiento inmunológico",
+    "tipo": "Complementario"
+  },
+  {
+    "tratamientoId": "TRA029",
+    "nombre": "Fisioterapia continua",
+    "tipo": "No farmacológico"
+  },
+  {
+    "tratamientoId": "TRA030",
+    "nombre": "Apoyo nutricional específico",
+    "tipo": "Dietético"
+  },
+  {
+    "tratamientoId": "TRA031",
+    "nombre": "Terapia génica",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA032",
+    "nombre": "Seguimiento especializado",
+    "tipo": "Complementario"
+  },
+  {
+    "tratamientoId": "TRA033",
+    "nombre": "Reeducación alimentaria",
+    "tipo": "Dietético"
+  },
+  {
+    "tratamientoId": "TRA034",
+    "nombre": "Control del reflujo",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA035",
+    "nombre": "Dieta sin gluten",
+    "tipo": "Dietético"
+  },
+  {
+    "tratamientoId": "TRA036",
+    "nombre": "Tratamiento hepático",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA037",
+    "nombre": "Tratamiento antibiótico urinario",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA038",
+    "nombre": "Control renal",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA039",
+    "nombre": "Terapia para cálculos renales",
+    "tipo": "Farmacológico"
+  },
+  {
+    "tratamientoId": "TRA040",
+    "nombre": "Hidratación intravenosa",
+    "tipo": "Complementario"
+  }
+]

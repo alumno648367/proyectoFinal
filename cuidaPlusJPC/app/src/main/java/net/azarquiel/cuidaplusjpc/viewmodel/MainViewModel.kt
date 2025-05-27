@@ -9,6 +9,8 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import net.azarquiel.cuidaplusjpc.model.GrupoFamiliar
 import net.azarquiel.cuidaplusjpc.utils.cargarEnfermedadesDesdeAssets
+import net.azarquiel.cuidaplusjpc.utils.cargarMedicamentosMaestroDesdeAssets
+import net.azarquiel.cuidaplusjpc.utils.cargarTratamientosMaestroDesdeAssets
 import net.azarquiel.cuidaplusjpc.view.MainActivity
 
 class MainViewModel(mainActivity: MainActivity) : ViewModel() {
@@ -19,6 +21,11 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
    val pacienteVM = PacienteViewModel()
    val enfermedadVM = EnfermedadViewModel()
    val enfermedadPacienteVM = EnfermedadPacienteViewModel()
+   val tratamientoVM = TratamientoViewModel()
+   val medicamentoVM = MedicamentoViewModel()
+   val tratamientoMaestroVM = TratamientoMaestroViewModel()
+   val medicamentoMaestroVM = MedicamentoMaestroViewModel()
+
 
    // Instancias únicas de FirebaseAuth y Firestore
    val auth = FirebaseAuth.getInstance()
@@ -205,6 +212,21 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
             .addOnFailureListener {
                Log.e("Firebase", "Error: ${it.message}")
             }
+      }
+   }
+   fun subirMedicamentosMaestro(context: Context) {
+      val lista = cargarMedicamentosMaestroDesdeAssets(context)
+      val col = db.collection("medicamentos_maestro")
+      for (m in lista) {
+         col.document(m.medicamentoId).set(m)
+      }
+   }
+
+   fun subirTratamientosMaestro(context: Context) {
+      val lista = cargarTratamientosMaestroDesdeAssets(context)
+      val col = db.collection("tratamientos_maestro")
+      for (t in lista) {
+         col.document(t.tratamientoId).set(t)
       }
    }
 

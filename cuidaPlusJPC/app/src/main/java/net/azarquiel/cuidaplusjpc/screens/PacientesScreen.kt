@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import net.azarquiel.cuidaplusjpc.R
+import net.azarquiel.cuidaplusjpc.model.EnfermedadPaciente
 import net.azarquiel.cuidaplusjpc.model.Paciente
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 import java.util.*
@@ -78,6 +79,12 @@ fun PacientesScreenContent(
     val pacientesFiltrados = pacientes.value.filter {
         it.nombreCompleto.contains(filtro, ignoreCase = true)
     }
+    val enfermedadesMap = viewModel.enfermedadPacienteVM.enfermedadesPorPaciente.observeAsState(emptyMap())
+
+    LaunchedEffect(pacientes.value) {
+        viewModel.enfermedadPacienteVM.cargarEnfermedadesParaPacientes(pacientes.value)
+    }
+
 
     LazyColumn(
         modifier = Modifier
@@ -108,7 +115,9 @@ fun PacientesScreenContent(
         }
 
         items(pacientesFiltrados) { paciente ->
-            PacienteDetailCard(paciente, navController)
+            val enfermedades = enfermedadesMap.value[paciente.pacienteId] ?: emptyList()
+            PacienteDetailCard(paciente, enfermedades, navController)
+
         }
 
         item {
@@ -119,7 +128,11 @@ fun PacientesScreenContent(
 
 @SuppressLint("SimpleDateFormat")
 @Composable
-fun PacienteDetailCard(paciente: Paciente, navController: NavHostController) {
+fun PacienteDetailCard(
+    paciente: Paciente,
+    enfermedades: List<EnfermedadPaciente>,
+    navController: NavHostController
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -143,7 +156,15 @@ fun PacienteDetailCard(paciente: Paciente, navController: NavHostController) {
 
             Divider()
 
-            Text("Medicación actual: (no implementado)")
+            if (enfermedades.isNotEmpty()) {
+                Text("Enfermedades:")
+                enfermedades.forEach {
+                    Text("- ${it.nombre} (${it.estado})", fontSize = 14.sp)
+                }
+            } else {
+                Text("Sin enfermedades registradas")
+            }
+
             Text("Citas médicas: (no implementado)")
             Text("Tratamientos: (no implementado)")
             Text("Historial médico: (no implementado)")

@@ -17,6 +17,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         val viewModel = MainViewModel(this)
         //viewModel.subirEnfermedadesAFirebase(this)
+        //viewModel.subirMedicamentosMaestro(this)
+        //viewModel.subirTratamientosMaestro(this)
+
         setContent {
             CuidaPlusJPCTheme {
                 AppNavigation(viewModel)
