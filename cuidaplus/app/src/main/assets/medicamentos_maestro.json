@@ -1,0 +1,237 @@
+[
+  {
+    "medicamentoId": "MED001",
+    "nombre": "Paracetamol",
+    "tipo": "Analgésico"
+  },
+  {
+    "medicamentoId": "MED002",
+    "nombre": "Ibuprofeno",
+    "tipo": "Antiinflamatorio"
+  },
+  {
+    "medicamentoId": "MED003",
+    "nombre": "Amoxicilina",
+    "tipo": "Antibiótico"
+  },
+  {
+    "medicamentoId": "MED004",
+    "nombre": "Omeprazol",
+    "tipo": "Inhibidor de la bomba de protones"
+  },
+  {
+    "medicamentoId": "MED005",
+    "nombre": "Loratadina",
+    "tipo": "Antihistamínico"
+  },
+  {
+    "medicamentoId": "MED006",
+    "nombre": "Metformina",
+    "tipo": "Antidiabético"
+  },
+  {
+    "medicamentoId": "MED007",
+    "nombre": "Salbutamol",
+    "tipo": "Broncodilatador"
+  },
+  {
+    "medicamentoId": "MED008",
+    "nombre": "Diazepam",
+    "tipo": "Ansiolítico"
+  },
+  {
+    "medicamentoId": "MED009",
+    "nombre": "Ácido acetilsalicílico",
+    "tipo": "Antitrombótico"
+  },
+  {
+    "medicamentoId": "MED010",
+    "nombre": "Simvastatina",
+    "tipo": "Hipolipemiante"
+  },
+  {
+    "medicamentoId": "MED011",
+    "nombre": "Atorvastatina",
+    "tipo": "Hipolipemiante"
+  },
+  {
+    "medicamentoId": "MED012",
+    "nombre": "Enalapril",
+    "tipo": "Antihipertensivo"
+  },
+  {
+    "medicamentoId": "MED013",
+    "nombre": "Losartán",
+    "tipo": "Antihipertensivo"
+  },
+  {
+    "medicamentoId": "MED014",
+    "nombre": "Metoprolol",
+    "tipo": "Betabloqueante"
+  },
+  {
+    "medicamentoId": "MED015",
+    "nombre": "Levotiroxina",
+    "tipo": "Hormona tiroidea"
+  },
+  {
+    "medicamentoId": "MED016",
+    "nombre": "Insulina glargina",
+    "tipo": "Antidiabético"
+  },
+  {
+    "medicamentoId": "MED017",
+    "nombre": "Ranitidina",
+    "tipo": "Antiulceroso"
+  },
+  {
+    "medicamentoId": "MED018",
+    "nombre": "Domperidona",
+    "tipo": "Antiemético"
+  },
+  {
+    "medicamentoId": "MED019",
+    "nombre": "Prednisona",
+    "tipo": "Corticoide"
+  },
+  {
+    "medicamentoId": "MED020",
+    "nombre": "Clopidogrel",
+    "tipo": "Antiagregante plaquetario"
+  },
+  {
+    "medicamentoId": "MED021",
+    "nombre": "Warfarina",
+    "tipo": "Anticoagulante"
+  },
+  {
+    "medicamentoId": "MED022",
+    "nombre": "Heparina",
+    "tipo": "Anticoagulante"
+  },
+  {
+    "medicamentoId": "MED023",
+    "nombre": "Hidroclorotiazida",
+    "tipo": "Diurético"
+  },
+  {
+    "medicamentoId": "MED024",
+    "nombre": "Nitroglicerina",
+    "tipo": "Vasodilatador"
+  },
+  {
+    "medicamentoId": "MED025",
+    "nombre": "Propranolol",
+    "tipo": "Betabloqueante"
+  },
+  {
+    "medicamentoId": "MED026",
+    "nombre": "Carbamazepina",
+    "tipo": "Anticonvulsivo"
+  },
+  {
+    "medicamentoId": "MED027",
+    "nombre": "Valproato sódico",
+    "tipo": "Anticonvulsivo"
+  },
+  {
+    "medicamentoId": "MED028",
+    "nombre": "Lamotrigina",
+    "tipo": "Anticonvulsivo"
+  },
+  {
+    "medicamentoId": "MED029",
+    "nombre": "Gabapentina",
+    "tipo": "Anticonvulsivo"
+  },
+  {
+    "medicamentoId": "MED030",
+    "nombre": "Quetiapina",
+    "tipo": "Antipsicótico"
+  },
+  {
+    "medicamentoId": "MED031",
+    "nombre": "Risperidona",
+    "tipo": "Antipsicótico"
+  },
+  {
+    "medicamentoId": "MED032",
+    "nombre": "Olanzapina",
+    "tipo": "Antipsicótico"
+  },
+  {
+    "medicamentoId": "MED033",
+    "nombre": "Haloperidol",
+    "tipo": "Antipsicótico"
+  },
+  {
+    "medicamentoId": "MED034",
+    "nombre": "Alprazolam",
+    "tipo": "Ansiolítico"
+  },
+  {
+    "medicamentoId": "MED035",
+    "nombre": "Clonazepam",
+    "tipo": "Ansiolítico"
+  },
+  {
+    "medicamentoId": "MED036",
+    "nombre": "Fluoxetina",
+    "tipo": "Antidepresivo"
+  },
+  {
+    "medicamentoId": "MED037",
+    "nombre": "Sertralina",
+    "tipo": "Antidepresivo"
+  },
+  {
+    "medicamentoId": "MED038",
+    "nombre": "Azitromicina",
+    "tipo": "Antibiótico"
+  },
+  {
+    "medicamentoId": "MED039",
+    "nombre": "Doxiciclina",
+    "tipo": "Antibiótico"
+  },
+  {
+    "medicamentoId": "MED040",
+    "nombre": "Ciprofloxacino",
+    "tipo": "Antibiótico"
+  },
+  {
+    "medicamentoId": "MED041",
+    "nombre": "Furosemida",
+    "tipo": "Diurético"
+  },
+  {
+    "medicamentoId": "MED042",
+    "nombre": "Hierro polimaltosado",
+    "tipo": "Suplemento mineral"
+  },
+  {
+    "medicamentoId": "MED043",
+    "nombre": "Vitamina D",
+    "tipo": "Vitamina"
+  },
+  {
+    "medicamentoId": "MED044",
+    "nombre": "Ácido fólico",
+    "tipo": "Vitamina"
+  },
+  {
+    "medicamentoId": "MED045",
+    "nombre": "Tiamina",
+    "tipo": "Vitamina"
+  },
+  {
+    "medicamentoId": "MED046",
+    "nombre": "Piridoxina",
+    "tipo": "Vitamina"
+  },
+  {
+    "medicamentoId": "MED047",
+    "nombre": "Cianocobalamina",
+    "tipo": "Vitamina"
+  }
+]
