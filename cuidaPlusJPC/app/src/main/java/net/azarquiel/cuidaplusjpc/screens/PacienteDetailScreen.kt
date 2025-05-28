@@ -167,6 +167,33 @@ fun PacienteDetailScreenContent(
 
                                     Divider(modifier = Modifier.padding(top = 12.dp))
                                 }
+
+                                LaunchedEffect(ep.enfermedadPacienteId) {
+                                    viewModel.medicamentoVM.cargarMedicamentos(ep.enfermedadPacienteId)
+                                }
+
+                                val medicamentos = viewModel.medicamentoVM.medicamentosPorEnfermedad[ep.enfermedadPacienteId] ?: emptyList()
+
+                                if (medicamentos.isNotEmpty()) {
+                                    Text("Medicación:")
+                                    medicamentos.forEach {
+                                        Text("  • ${it.nombre} (${it.dosis}, ${it.frecuencia}, ${it.viaAdministracion})", fontSize = 14.sp)
+                                    }
+                                } else {
+                                    Text("  No tiene medicación registrada.", fontSize = 14.sp, color = Color.Gray)
+                                }
+
+                                Button(
+                                    onClick = {
+                                        navController.navigate("gestionarMedicacion/${ep.enfermedadPacienteId}")
+                                    },
+                                    modifier = Modifier.align(Alignment.End),
+                                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
+                                ) {
+                                    Text("Gestionar medicación", color = Color.White)
+                                }
+
+
                             }
 
                         }

@@ -19,12 +19,17 @@ class PacienteViewModel : ViewModel() {
     /**
      * Carga la lista de pacientes de un grupo específico
      */
+    fun escucharPaciente(
+        pacienteId: String,
+        onChange: (Paciente?) -> Unit
+    ) {
+        repo.escucharPaciente(pacienteId, onChange)
+    }
     fun cargarPacientesDelGrupo(grupoId: String) {
         repo.obtenerPacientesPorGrupo(grupoId) { lista ->
             _pacientes.value = lista
         }
     }
-
     /**
      * Guarda un nuevo paciente en Firestore
      */
@@ -36,12 +41,7 @@ class PacienteViewModel : ViewModel() {
         repo.guardarPaciente(paciente, onSuccess, onFailure)
     }
 
-    fun escucharPaciente(
-        pacienteId: String,
-        onChange: (Paciente?) -> Unit
-    ) {
-        repo.escucharPaciente(pacienteId, onChange)
-    }
+
 
     /**
      * Actualiza campos específicos de un paciente

@@ -57,4 +57,8 @@ class UsuarioViewModel : ViewModel() {
     ) {
         repo.eliminarUsuario(uid, onSuccess, onFailure)
     }
+    fun setUsuario(usuario: Usuario) {
+        _usuario.value = usuario
+    }
+
 }

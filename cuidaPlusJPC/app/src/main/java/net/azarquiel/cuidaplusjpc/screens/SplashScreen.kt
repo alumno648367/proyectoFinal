@@ -1,12 +1,10 @@
 package net.azarquiel.cuidaplusjpc.screens
 
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -14,6 +12,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.tasks.await
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.navigation.AppScreens
@@ -21,35 +20,23 @@ import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
 @Composable
 fun SplashScreen(navController: NavHostController, viewModel: MainViewModel) {
-    // Retraso para simular splash y comprobar usuario
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
+    val pacientes by viewModel.pacienteVM.pacientes.observeAsState()
+    var esperandoPacientes by remember { mutableStateOf(false) }
 
     LaunchedEffect(true) {
-        kotlinx.coroutines.delay(1000)
+        delay(1000)
 
         if (currentUser != null) {
             val uid = currentUser.uid
+            val datosCargados = viewModel.cargarDatosDeUsuario(uid)
+            println("¿Datos cargados? $datosCargados")
+            println("Grupo usuario: ${viewModel.usuarioVM.usuario.value?.grupos}")
 
-            // Verificar si el usuario existe
-            val doc = viewModel.db.collection("usuarios").document(uid).get().await()
-            if (doc.exists()) {
-                viewModel.usuarioVM.empezarEscucha(uid)
-
-                // Espera a que el usuario cargue
-                viewModel.usuarioVM.usuario.observeForever { usuario ->
-                    val grupoId = usuario?.grupos?.firstOrNull()
-                    if (!grupoId.isNullOrEmpty()) {
-                        viewModel.grupoVM.cargarGrupo(grupoId)
-                        viewModel.pacienteVM.cargarPacientesDelGrupo(grupoId)
-                    }
-                }
-
-                navController.navigate(AppScreens.MainScreen.route) {
-                    popUpTo(0)
-                }
+            if (datosCargados) {
+                esperandoPacientes = true
             } else {
-                // Eliminar usuario si no tiene documento
                 currentUser.delete().await()
                 auth.signOut()
                 navController.navigate(AppScreens.HomeScreen.route) {
@@ -63,6 +50,14 @@ fun SplashScreen(navController: NavHostController, viewModel: MainViewModel) {
         }
     }
 
+    LaunchedEffect(pacientes, esperandoPacientes) {
+        println("PACIENTES OBSERVADOS: ${pacientes?.size}")
+        if (esperandoPacientes && !pacientes.isNullOrEmpty()) {
+            navController.navigate(AppScreens.MainScreen.route) {
+                popUpTo(0)
+            }
+        }
+    }
 
     // Pantalla visual
     Box(

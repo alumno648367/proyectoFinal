@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.tasks.await
 import net.azarquiel.cuidaplusjpc.model.GrupoFamiliar
 import net.azarquiel.cuidaplusjpc.utils.cargarEnfermedadesDesdeAssets
 import net.azarquiel.cuidaplusjpc.utils.cargarMedicamentosMaestroDesdeAssets
@@ -229,6 +231,31 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
          col.document(t.tratamientoId).set(t)
       }
    }
+   suspend fun cargarDatosDeUsuario(uid: String): Boolean {
+      val doc = db.collection("usuarios").document(uid).get().await()
+      if (!doc.exists()) return false
+
+      val usuario = doc.toObject(Usuario::class.java)
+      if (usuario != null) {
+         usuario.usuarioId = uid
+         usuarioVM.setUsuario(usuario)
+
+         val grupoId = usuario.grupos.firstOrNull()
+         if (!grupoId.isNullOrEmpty()) {
+            grupoVM.cargarGrupo(grupoId)
+            pacienteVM.cargarPacientesDelGrupo(grupoId)
+
+            // Espera manual para asegurarse
+            repeat(20) {
+               if (!pacienteVM.pacientes.value.isNullOrEmpty()) return true
+               delay(200)
+            }
+         }
+      }
+      return false
+   }
+
+
 
 
 }
