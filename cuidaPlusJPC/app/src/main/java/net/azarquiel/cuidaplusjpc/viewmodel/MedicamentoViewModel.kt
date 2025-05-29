@@ -1,3 +1,4 @@
+
 package net.azarquiel.cuidaplusjpc.viewmodel
 
 import androidx.compose.runtime.mutableStateMapOf
@@ -38,7 +39,7 @@ class MedicamentoViewModel : ViewModel() {
     )
 
     fun cargarMedicamentos(enfermedadPacienteId: String) {
-        repo.getMedicamentosPorEnfermedad(enfermedadPacienteId) { lista ->
+        repo.getMedicamentosPorEnfermedadPaciente(enfermedadPacienteId) { lista ->
             medicamentosPorEnfermedad[enfermedadPacienteId] = lista
         }
     }

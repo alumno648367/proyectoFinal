@@ -354,4 +354,3 @@ fun EditarPacienteDialog(
         containerColor = MaterialTheme.colorScheme.surface
     )
 }
-
