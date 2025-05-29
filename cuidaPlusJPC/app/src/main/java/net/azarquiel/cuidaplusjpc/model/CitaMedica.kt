@@ -1,13 +1,14 @@
 package net.azarquiel.cuidaplusjpc.model
 
 data class CitaMedica(
-    var citaMedicaId: String = "",         // ID único
-    var pacienteId: String = "",           // Relación con paciente
-    var fecha: String = "",                // Ej: "2025-06-12T10:30", o usar Date/Timestamp
-    var especialidad: String = "",         // Ej: "Cardiología"
-    var medico: String = "",               // Nombre del médico
-    var ubicacion: String = "",            // Hospital o consulta
-    var motivo: String = "",               // Motivo de la cita
+    var citaMedicaId: String = "",
+    var pacienteId: String = "",
+    var usuarioAcompananteId: String = "",
+    var fechaHora: Long = 0L,              // Timestamp en milisegundos
+    var especialidad: String = "",
+    var medico: String = "",
+    var ubicacion: String = "",
+    var motivo: String = "",
     var observaciones: String = "",
-    var estado: String = ""                // Ej: "Pendiente", "Realizada", "Cancelada"
+    var realizada: Boolean = false         // True si ya se realizó
 )

@@ -67,6 +67,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-auth:20.7.0")
     implementation ("com.google.firebase:firebase-auth-ktx")
     implementation ("com.google.code.gson:gson:2.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.material3.lint)
     testImplementation(libs.junit)
