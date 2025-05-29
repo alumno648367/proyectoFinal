@@ -95,4 +95,22 @@ class PacienteRepository {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+    fun getPacientesDelGrupo(
+        grupoFamiliarId: String,
+        onResult: (List<Paciente>) -> Unit
+    ) {
+        FirebaseFirestore.getInstance()
+            .collection("pacientes")
+            .whereEqualTo("grupoFamiliarId", grupoFamiliarId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) {
+                    onResult(emptyList())
+                    return@addSnapshotListener
+                }
+                val lista = snapshot.toObjects(Paciente::class.java)
+                onResult(lista)
+            }
+    }
+
+
 }

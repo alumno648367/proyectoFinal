@@ -14,6 +14,8 @@ class UsuarioViewModel : ViewModel() {
     private val _usuario = MutableLiveData<Usuario?>()
     val usuario: MutableLiveData<Usuario?> = _usuario
 
+    val usuariosGrupo: MutableLiveData<List<Usuario>> = MutableLiveData()
+
     /**
      * Escucha los cambios en tiempo real del usuario según su UID
      * Actualiza automáticamente el LiveData cuando se detectan cambios en Firestore
@@ -57,4 +59,11 @@ class UsuarioViewModel : ViewModel() {
     ) {
         repo.eliminarUsuario(uid, onSuccess, onFailure)
     }
+    fun obtenerUsuariosPorIds(ids: List<String>) {
+        repo.getUsuariosPorIds(ids) { lista ->
+            usuariosGrupo.value = lista
+        }
+    }
+
+
 }

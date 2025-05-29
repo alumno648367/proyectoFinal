@@ -73,7 +73,19 @@ fun PacientesScreenContent(
     navController: NavHostController,
     padding: PaddingValues
 ) {
-    val pacientes = viewModel.pacienteVM.pacientes.observeAsState(emptyList())
+    val grupo = viewModel.grupoVM.grupo.observeAsState().value
+    val pacientesState = viewModel.pacienteVM.pacientes.observeAsState(emptyList())
+
+    LaunchedEffect(grupo?.grupoFamiliarId) {
+        if (pacientesState.value.isEmpty()) {
+            grupo?.let {
+                viewModel.pacienteVM.cargarPacientesDelGrupo(it.grupoFamiliarId)
+            }
+        }
+    }
+
+
+    val pacientes = viewModel.pacienteVM.pacientesDelGrupo.observeAsState(emptyList())
     var filtro by remember { mutableStateOf("") }
 
     val pacientesFiltrados = pacientes.value.filter {

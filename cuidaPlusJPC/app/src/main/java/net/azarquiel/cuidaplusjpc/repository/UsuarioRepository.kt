@@ -3,6 +3,7 @@ package net.azarquiel.cuidaplusjpc.repository
 import Usuario
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.FieldPath
 
 class UsuarioRepository {
 
@@ -71,4 +72,27 @@ class UsuarioRepository {
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { onFailure(it) }
     }
+
+    fun getUsuariosPorIds(
+        ids: List<String>,
+        onResult: (List<Usuario>) -> Unit
+    ) {
+        if (ids.isEmpty()) {
+            onResult(emptyList())
+            return
+        }
+
+        ref.whereIn(FieldPath.documentId(), ids)
+            .get()
+            .addOnSuccessListener { result ->
+                val lista = result.mapNotNull { it.toObject<Usuario>() }
+                onResult(lista)
+            }
+            .addOnFailureListener {
+                onResult(emptyList())
+            }
+    }
+
+
+
 }

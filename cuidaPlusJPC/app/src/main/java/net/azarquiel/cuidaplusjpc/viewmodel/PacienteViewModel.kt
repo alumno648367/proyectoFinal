@@ -16,14 +16,16 @@ class PacienteViewModel : ViewModel() {
     private val _pacientes = MutableLiveData<List<Paciente>>()
     val pacientes: MutableLiveData<List<Paciente>> = _pacientes
 
+    val pacientesDelGrupo = MutableLiveData<List<Paciente>>()
     /**
      * Carga la lista de pacientes de un grupo específico
      */
     fun cargarPacientesDelGrupo(grupoId: String) {
         repo.obtenerPacientesPorGrupo(grupoId) { lista ->
-            _pacientes.value = lista
+            pacientesDelGrupo.value = lista  // ← CORRECTO
         }
     }
+
 
     /**
      * Guarda un nuevo paciente en Firestore
@@ -80,4 +82,13 @@ class PacienteViewModel : ViewModel() {
             )
         }
     }
+
+
+    fun escucharPacientesDelGrupo(grupoFamiliarId: String) {
+        repo.getPacientesDelGrupo(grupoFamiliarId) { lista ->
+            pacientesDelGrupo.value = lista
+        }
+    }
+
+
 }
