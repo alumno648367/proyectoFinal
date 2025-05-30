@@ -31,7 +31,6 @@ import androidx.navigation.NavHostController
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.model.Paciente
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
-import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable

@@ -25,7 +25,7 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
    val medicamentoVM = MedicamentoViewModel()
    val tratamientoMaestroVM = TratamientoMaestroViewModel()
    val medicamentoMaestroVM = MedicamentoMaestroViewModel()
-   val citaMedicaVM = CitaMedicaViewModel()
+   val citaVM = CitaViewModel()
 
 
    // Instancias únicas de FirebaseAuth y Firestore

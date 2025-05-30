@@ -17,5 +17,5 @@ sealed class BottomNavItem(val title: String, val route: String, val icon: Image
 
     object Pacientes : BottomNavItem("Pacientes", "pacientes", Icons.Filled.MedicalServices)
 
-    object Citas : BottomNavItem("Citas", "citas", Icons.Filled.Event)
+    object Citas : BottomNavItem("Citas", "citas/{grupoFamiliarId}", Icons.Filled.Event)
 }

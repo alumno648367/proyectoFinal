@@ -4,11 +4,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import net.azarquiel.cuidaplusjpc.R
-
 @Composable
-fun BottomNavigationBar(navController: NavController) {
+fun BottomNavigationBar(
+    navController: NavController,
+    grupoId: String?
+) {
     val items = listOf(
         BottomNavItem.Perfil,
         BottomNavItem.Grupo,
@@ -16,27 +17,29 @@ fun BottomNavigationBar(navController: NavController) {
         BottomNavItem.Pacientes,
         BottomNavItem.Citas
     )
-    NavigationBar(containerColor = colorResource(R.color.primario)) {
-        val navBackStackEntry = navController.currentBackStackEntryAsState()
-        val currentRoute = navBackStackEntry.value?.destination?.route
 
+    NavigationBar(containerColor = colorResource(R.color.primario)) {
         items.forEach { item ->
+            // 3. Si es el item "Citas" y tenemos grupoId, navegamos a citas/<grupoId>
+            val targetRoute = if (item == BottomNavItem.Citas && grupoId != null) {
+                "citas/$grupoId"
+            } else {
+                item.route
+            }
+
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
-                //label = { Text(item.title) },
-                selected = currentRoute == item.route,
+                selected = navController.currentDestination?.route == targetRoute,
                 onClick = {
-                    navController.navigate(item.route) {
-                        popUpTo(item.route) {
-                            inclusive = true
-                        }
+                    navController.navigate(targetRoute) {
+                        popUpTo(targetRoute) { inclusive = true }
                         launchSingleTop = true
                         restoreState = true
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                    indicatorColor = colorResource(R.color.secundario)
+                    indicatorColor   = colorResource(R.color.secundario)
                 )
             )
         }

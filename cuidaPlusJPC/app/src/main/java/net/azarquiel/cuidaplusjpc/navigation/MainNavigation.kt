@@ -27,9 +27,26 @@ fun MainNavigation(
         composable("grupo") {
             GrupoScreen(navController, viewModel)
         }
-        composable("citas") {
-            CitasScreen(navController, viewModel)
+        composable("citas/{grupoFamiliarId}") { backStackEntry ->
+            val grupoId = backStackEntry.arguments?.getString("grupoFamiliarId") ?: return@composable
+            CitasScreen(
+                navController = navController,
+                viewModel = viewModel.citaVM,
+                mainViewModel = viewModel,
+                grupoId = grupoId,
+                padding = padding
+            )
         }
+        composable("addCita/{grupoFamiliarId}") { backStackEntry ->
+            val grupoId = backStackEntry.arguments?.getString("grupoFamiliarId") ?: return@composable
+            AddCitaScreen(
+                navController = navController,
+                viewModel = viewModel,
+                grupoId = grupoId,
+                padding = padding
+            )
+        }
+
         composable("pacientes") {
             PacientesScreen(navController, viewModel, padding)
         }
