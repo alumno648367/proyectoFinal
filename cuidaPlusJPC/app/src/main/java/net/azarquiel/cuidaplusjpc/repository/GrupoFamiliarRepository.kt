@@ -7,15 +7,11 @@ import net.azarquiel.cuidaplusjpc.model.GrupoFamiliar
 
 class GrupoFamiliarRepository {
 
-    // Referencia a la instancia de Firestore
     private val db = FirebaseFirestore.getInstance()
-
-    // Referencia a la colección "gruposFamiliares"
     private val ref = db.collection("gruposFamiliares")
 
     /**
-     * Crea un nuevo documento en la colección "gruposFamiliares"
-     * con los datos del grupo proporcionado
+     * Crea un grupo familiar con el ID y datos proporcionados.
      */
     fun crearGrupo(
         grupo: GrupoFamiliar,
@@ -28,8 +24,7 @@ class GrupoFamiliarRepository {
     }
 
     /**
-     * Obtiene un grupo por su ID y lo devuelve como objeto
-     * a través del callback 'onResult'
+     * Obtiene un grupo familiar por su ID.
      */
     fun obtenerGrupo(
         grupoId: String,
@@ -46,69 +41,12 @@ class GrupoFamiliarRepository {
     }
 
     /**
-     * Añade un UID a la lista de miembros del grupo
-     * usando FieldValue.arrayUnion para evitar duplicados
+     * Obtiene un grupo familiar por su nombre (consulta única).
      */
-    fun añadirMiembro(
-        grupoId: String,
-        uid: String,
-        onSuccess: () -> Unit = {},
-        onFailure: (Exception) -> Unit = {}
+    fun obtenerGrupoPorNombre(
+        nombre: String,
+        onResult: (GrupoFamiliar?) -> Unit
     ) {
-        ref.document(grupoId)
-            .update("miembros", FieldValue.arrayUnion(uid))
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
-    }
-
-    /**
-     * Actualiza campos específicos del grupo familiar
-     * (por ejemplo nombre o lista de pacientes)
-     */
-    fun editarGrupo(
-        grupoId: String,
-        nuevosDatos: Map<String, Any>,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        ref.document(grupoId).update(nuevosDatos)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
-    }
-
-    /**
-     * Elimina completamente el documento del grupo de la colección
-     */
-    fun eliminarGrupo(
-        grupoId: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        ref.document(grupoId).delete()
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
-    }
-
-    /**
-     * Escucha en tiempo real los cambios del grupo por su ID
-     * Ideal para actualizar la interfaz automáticamente si se modifica
-     */
-    fun escucharGrupo(
-        grupoId: String,
-        onChange: (GrupoFamiliar?) -> Unit
-    ) {
-        ref.document(grupoId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    onChange(null)
-                    return@addSnapshotListener
-                }
-                val grupo = snapshot?.toObject<GrupoFamiliar>()
-                onChange(grupo)
-            }
-    }
-    fun obtenerGrupoPorNombre(nombre: String, onResult: (GrupoFamiliar?) -> Unit) {
-        val db = FirebaseFirestore.getInstance()
         db.collection("gruposFamiliares")
             .whereEqualTo("nombre", nombre)
             .get()
@@ -125,4 +63,63 @@ class GrupoFamiliarRepository {
             }
     }
 
+    /**
+     * Añade un nuevo miembro (UID) al grupo usando arrayUnion.
+     */
+    fun añadirMiembro(
+        grupoId: String,
+        uid: String,
+        onSuccess: () -> Unit = {},
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        ref.document(grupoId)
+            .update("miembros", FieldValue.arrayUnion(uid))
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    /**
+     * Edita campos específicos del grupo familiar.
+     */
+    fun editarGrupo(
+        grupoId: String,
+        nuevosDatos: Map<String, Any>,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        ref.document(grupoId).update(nuevosDatos)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    /**
+     * Elimina por completo el grupo familiar.
+     */
+    fun eliminarGrupo(
+        grupoId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        ref.document(grupoId).delete()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
+
+    /**
+     * Escucha en tiempo real los cambios en el grupo familiar.
+     */
+    fun escucharGrupo(
+        grupoId: String,
+        onChange: (GrupoFamiliar?) -> Unit
+    ) {
+        ref.document(grupoId)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    onChange(null)
+                    return@addSnapshotListener
+                }
+                val grupo = snapshot?.toObject<GrupoFamiliar>()
+                onChange(grupo)
+            }
+    }
 }

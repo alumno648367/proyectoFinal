@@ -6,16 +6,12 @@ import net.azarquiel.cuidaplusjpc.model.Paciente
 
 class PacienteRepository {
 
-    // Conexión principal a Firebase Firestore
     private val db = FirebaseFirestore.getInstance()
-
-    // Referencia directa a la colección "pacientes"
     private val ref = db.collection("pacientes")
 
     /**
-     * Guarda el documento del paciente en la base de datos
-     * - Si el documento ya existe, lo sobrescribe
-     * - El ID del documento es el pacienteId único
+     * Guarda o actualiza un paciente en Firestore.
+     * Si el ID está vacío, devuelve error.
      */
     fun guardarPaciente(
         paciente: Paciente,
@@ -34,8 +30,7 @@ class PacienteRepository {
     }
 
     /**
-     * Escucha los cambios en tiempo real de un paciente específico por ID
-     * - Cada vez que el documento se actualiza, se recibe el nuevo objeto Paciente
+     * Escucha en tiempo real los cambios de un paciente por ID.
      */
     fun escucharPaciente(
         pacienteId: String,
@@ -50,10 +45,12 @@ class PacienteRepository {
     }
 
     /**
-     * Obtiene la lista de pacientes que pertenecen a un grupo familiar
-     * - Se filtra por grupoFamiliarId
+     * Obtiene todos los pacientes de un grupo familiar por ID.
      */
-    fun obtenerPacientesPorGrupo(grupoId: String, onResult: (List<Paciente>) -> Unit) {
+    fun obtenerPacientesPorGrupo(
+        grupoId: String,
+        onResult: (List<Paciente>) -> Unit
+    ) {
         db.collection("pacientes")
             .whereEqualTo("grupoFamiliarId", grupoId)
             .addSnapshotListener { snapshot, error ->
@@ -67,34 +64,10 @@ class PacienteRepository {
             }
     }
 
-
     /**
-     * Actualiza campos específicos del documento del paciente
-     * - Solo modifica los campos incluidos en el Map
+     * (Duplicado funcional) También obtiene pacientes de un grupo.
+     * Se recomienda unificar en uno solo si no hay diferencias.
      */
-    fun actualizarPaciente(
-        pacienteId: String,
-        campos: Map<String, Any>,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        ref.document(pacienteId).update(campos)
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
-    }
-
-    /**
-     * Elimina el documento completo del paciente en Firestore
-     */
-    fun eliminarPaciente(
-        pacienteId: String,
-        onSuccess: () -> Unit,
-        onFailure: (Exception) -> Unit
-    ) {
-        ref.document(pacienteId).delete()
-            .addOnSuccessListener { onSuccess() }
-            .addOnFailureListener { onFailure(it) }
-    }
     fun getPacientesDelGrupo(
         grupoFamiliarId: String,
         onResult: (List<Paciente>) -> Unit
@@ -112,5 +85,30 @@ class PacienteRepository {
             }
     }
 
+    /**
+     * Actualiza campos específicos del paciente por su ID.
+     */
+    fun actualizarPaciente(
+        pacienteId: String,
+        campos: Map<String, Any>,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        ref.document(pacienteId).update(campos)
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
 
+    /**
+     * Elimina el documento del paciente por su ID.
+     */
+    fun eliminarPaciente(
+        pacienteId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        ref.document(pacienteId).delete()
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onFailure(it) }
+    }
 }

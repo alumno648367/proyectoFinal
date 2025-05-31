@@ -44,7 +44,7 @@ fun HomeScreenContent(padding: PaddingValues, navController: NavHostController) 
     ) {
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Logo animado
+        // Logo con animación de entrada
         AnimatedVisibility(
             visible = true,
             enter = fadeIn() + scaleIn()
@@ -58,7 +58,7 @@ fun HomeScreenContent(padding: PaddingValues, navController: NavHostController) 
             )
         }
 
-        // Nombre + lema
+        // Nombre de la app + lema
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = "Cuida+",
@@ -75,7 +75,7 @@ fun HomeScreenContent(padding: PaddingValues, navController: NavHostController) 
             )
         }
 
-        // Botón principal
+        // Botón para empezar registro
         Button(
             onClick = { navController.navigate(AppScreens.RegisterUsuarioScreen.route) },
             modifier = Modifier
@@ -89,22 +89,21 @@ fun HomeScreenContent(padding: PaddingValues, navController: NavHostController) 
         ) {
             Text(
                 text = "Empezar",
-                fontSize = 20.sp,  // Más grande
+                fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold
             )
         }
 
-        // Enlace a login con más visibilidad
+        // Enlace inferior para usuarios ya registrados
         Text(
             text = "¿Ya tienes una cuenta? Inicia sesión",
             modifier = Modifier
                 .padding(top = 16.dp)
                 .clickable { navController.navigate(AppScreens.LoginUsuarioScreen.route) },
             color = colorResource(R.color.texto_principal),
-            fontSize = 16.sp,  // Más grande
+            fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
         )
-
     }
 }

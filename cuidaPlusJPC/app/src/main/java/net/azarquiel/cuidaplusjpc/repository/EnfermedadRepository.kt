@@ -4,9 +4,15 @@ import com.google.firebase.firestore.FirebaseFirestore
 import net.azarquiel.cuidaplusjpc.model.Enfermedad
 
 class EnfermedadRepository {
+
     private val db = FirebaseFirestore.getInstance()
 
-    fun obtenerEnfermedades(onResult: (List<Enfermedad>) -> Unit) {
+    /**
+     * Obtiene la lista completa de enfermedades ordenadas alfabéticamente por nombre.
+     */
+    fun obtenerEnfermedades(
+        onResult: (List<Enfermedad>) -> Unit
+    ) {
         db.collection("enfermedades")
             .orderBy("nombre")
             .addSnapshotListener { snapshot, error ->
@@ -19,5 +25,4 @@ class EnfermedadRepository {
                 onResult(lista)
             }
     }
-
 }

@@ -41,6 +41,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
     val context = LocalContext.current
     val clientId = stringResource(id = R.string.default_web_client_id)
 
+    // Configuración para iniciar sesión con Google
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(clientId)
@@ -49,13 +50,16 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
     }
     val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
 
+    // Resultado del intent de Google Sign-In
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
         try {
             val account = task.getResult(ApiException::class.java)
-            viewModel.registroConGoogle(account.idToken ?: "",
+            // Si todo va bien, usamos el token para registrarnos en Firebase
+            viewModel.registroConGoogle(
+                account.idToken ?: "",
                 onSuccess = {
                     Toast.makeText(context, "Sesión iniciada con Google", Toast.LENGTH_SHORT).show()
                     navController.navigate(AppScreens.RegisterCompletoScreen.route)
@@ -69,12 +73,14 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
         }
     }
 
+    // Estados del formulario
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showEmailError by remember { mutableStateOf(false) }
     var showPasswordError by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
 
+    // Diseño principal centrado
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -82,7 +88,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Icono y título
+        // Cabecera
         Icon(
             imageVector = Icons.Default.Person,
             contentDescription = "Usuario",
@@ -99,7 +105,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Campo Email
+        // Campo de email
         OutlinedTextField(
             value = email,
             onValueChange = {
@@ -119,7 +125,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             )
         )
 
-        // Campo Contraseña
+        // Campo de contraseña con icono para mostrar/ocultar
         OutlinedTextField(
             value = password,
             onValueChange = {
@@ -146,7 +152,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             )
         )
 
-        // Términos legales
+        // Aviso de términos legales
         Text(
             text = "Al registrarte, aceptas la Política de privacidad y los Términos de servicio",
             fontSize = 12.sp,
@@ -155,7 +161,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Botón Registrar
+        // Botón de registro con email y contraseña
         Button(
             onClick = {
                 val emailOk = email.isNotBlank()
@@ -165,7 +171,8 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
                 showPasswordError = !passwordOk
 
                 if (emailOk && passwordOk) {
-                    viewModel.registroConEmail(email, password,
+                    viewModel.registroConEmail(
+                        email, password,
                         onSuccess = {
                             Toast.makeText(context, "Usuario creado", Toast.LENGTH_SHORT).show()
                             navController.navigate(AppScreens.RegisterCompletoScreen.route)
@@ -191,7 +198,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Google Sign-In
+        // Botón de Google Sign-In
         Button(
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent

@@ -7,16 +7,12 @@ import com.google.firebase.firestore.FieldPath
 
 class UsuarioRepository {
 
-    // Conexión principal a Firebase Firestore
     private val db = FirebaseFirestore.getInstance()
-
-    // Referencia directa a la colección "usuarios"
     private val ref = db.collection("usuarios")
 
     /**
-     * Guarda el documento del usuario en la base de datos
-     * - Si el documento ya existe, lo sobrescribe
-     * - El ID del documento es el UID del usuario autenticado
+     * Guarda o actualiza el documento del usuario en Firestore.
+     * El ID usado es el UID del usuario autenticado.
      */
     fun guardarUsuario(
         usuario: Usuario,
@@ -30,8 +26,7 @@ class UsuarioRepository {
     }
 
     /**
-     * Escucha los cambios en tiempo real del documento de un usuario
-     * - Cada vez que el documento se actualiza, se recibe el nuevo objeto Usuario
+     * Escucha en tiempo real los cambios de un usuario por su UID.
      */
     fun escucharUsuario(
         uid: String,
@@ -46,8 +41,7 @@ class UsuarioRepository {
     }
 
     /**
-     * Actualiza campos específicos del documento del usuario
-     * - Solo modifica los campos incluidos en el Map
+     * Actualiza campos específicos del usuario por su UID.
      */
     fun actualizarUsuario(
         uid: String,
@@ -61,7 +55,7 @@ class UsuarioRepository {
     }
 
     /**
-     * Elimina el documento completo del usuario en Firestore
+     * Elimina completamente el documento del usuario en Firestore.
      */
     fun eliminarUsuario(
         uid: String,
@@ -73,6 +67,9 @@ class UsuarioRepository {
             .addOnFailureListener { onFailure(it) }
     }
 
+    /**
+     * Obtiene una lista de usuarios a partir de sus UIDs (máx. 10 por restricción de Firebase).
+     */
     fun getUsuariosPorIds(
         ids: List<String>,
         onResult: (List<Usuario>) -> Unit
@@ -92,7 +89,4 @@ class UsuarioRepository {
                 onResult(emptyList())
             }
     }
-
-
-
 }

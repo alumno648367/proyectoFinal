@@ -8,7 +8,13 @@ class EnfermedadPacienteRepository {
     private val db = FirebaseFirestore.getInstance()
     private val ref = db.collection("enfermedadesPaciente")
 
-    fun enfermedadPorPaciente(pacienteId: String, onResult: (List<EnfermedadPaciente>) -> Unit) {
+    /**
+     * Recupera todas las enfermedades asociadas a un paciente.
+     */
+    fun enfermedadPorPaciente(
+        pacienteId: String,
+        onResult: (List<EnfermedadPaciente>) -> Unit
+    ) {
         ref.whereEqualTo("pacienteId", pacienteId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null || snapshot == null) {
@@ -20,6 +26,9 @@ class EnfermedadPacienteRepository {
             }
     }
 
+    /**
+     * Guarda o actualiza una enfermedad asignada a un paciente.
+     */
     fun guardarEnfermedadPaciente(
         ep: EnfermedadPaciente,
         onSuccess: () -> Unit,
@@ -31,6 +40,9 @@ class EnfermedadPacienteRepository {
             .addOnFailureListener { onFailure(it) }
     }
 
+    /**
+     * Elimina una enfermedad asociada a un paciente por su ID.
+     */
     fun eliminarEnfermedadPaciente(
         enfermedadPacienteId: String,
         onSuccess: () -> Unit,

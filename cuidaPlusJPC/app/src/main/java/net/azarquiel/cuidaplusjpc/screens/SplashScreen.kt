@@ -1,10 +1,8 @@
 package net.azarquiel.cuidaplusjpc.screens
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -26,44 +24,26 @@ fun SplashScreen(navController: NavHostController, viewModel: MainViewModel) {
     val currentUser = auth.currentUser
     val usuario by viewModel.usuarioVM.usuario.observeAsState()
 
-    // Efecto lanzado una sola vez al entrar en la pantalla
+    // Se ejecuta al entrar por primera vez a la pantalla
     LaunchedEffect(true) {
-        delay(1000) // Espera breve para mostrar el splash
+        delay(1000) // Mostramos el logo al menos 1 segundo
 
         if (currentUser == null) {
-            // Si no hay usuario logueado → ir a pantalla Home
+            // Si no hay usuario logueado, vamos a Home
             navController.navigate(AppScreens.HomeScreen.route) {
                 popUpTo(0)
             }
         } else {
             val uid = currentUser.uid
 
-            // Comprobamos si el usuario existe en la colección "usuarios"
+            // Verificamos si existe el documento del usuario en Firestore
             val doc = viewModel.db.collection("usuarios").document(uid).get().await()
 
             if (doc.exists()) {
-                // Si existe, empezamos a escuchar sus datos
+                // Activamos la escucha del usuario
                 viewModel.usuarioVM.empezarEscucha(uid)
-
-                // Esperamos a que LiveData se llene (usuario cargado)
-                while (viewModel.usuarioVM.usuario.value == null) {
-                    delay(100)
-                }
-
-                // Cargar grupo y pacientes si tiene grupo asignado
-                val grupoId = viewModel.usuarioVM.usuario.value?.grupos?.firstOrNull()
-                if (!grupoId.isNullOrEmpty()) {
-                    viewModel.grupoVM.cargarGrupo(grupoId)
-                    viewModel.pacienteVM.cargarPacientesDelGrupo(grupoId)
-                }
-
-                // Ir a la pantalla de inicio principal
-                navController.navigate("inicio") {
-                    popUpTo(0)
-                }
-
             } else {
-                // Si Auth está activo pero el documento no existe → cerramos sesión
+                // Si el usuario no está en la base de datos, cerramos sesión
                 auth.signOut()
                 navController.navigate(AppScreens.HomeScreen.route) {
                     popUpTo(0)
@@ -72,7 +52,22 @@ fun SplashScreen(navController: NavHostController, viewModel: MainViewModel) {
         }
     }
 
-    // Parte visual del splash: logo y título centrados
+    // Este bloque se ejecuta automáticamente cuando el usuario se ha cargado
+    LaunchedEffect(usuario) {
+        if (usuario != null) {
+            val grupoId = usuario!!.grupos.firstOrNull()
+            if (!grupoId.isNullOrEmpty()) {
+                viewModel.grupoVM.cargarGrupo(grupoId)
+                viewModel.pacienteVM.cargarPacientesDelGrupo(grupoId)
+            }
+
+            navController.navigate("inicio") {
+                popUpTo(0)
+            }
+        }
+    }
+
+    // Parte visual del splash
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -86,18 +81,12 @@ fun SplashScreen(navController: NavHostController, viewModel: MainViewModel) {
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
-                    painter = painterResource(id = R.drawable.logosinfondo),
+                    painter = painterResource(id = R.drawable.logosinfondoconletras),
                     contentDescription = "Logo",
-                    modifier = Modifier.size(300.dp)
+                    modifier = Modifier.size(350.dp)
                 )
                 Spacer(modifier = Modifier.height(24.dp))
-                Text(
-                    text = "Cuida+",
-                    style = MaterialTheme.typography.displaySmall,
-                    color = colorResource(R.color.texto_principal)
-                )
             }
         }
     }
-
 }

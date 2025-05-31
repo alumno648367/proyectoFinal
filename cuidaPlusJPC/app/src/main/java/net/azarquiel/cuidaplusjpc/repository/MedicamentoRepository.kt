@@ -8,6 +8,9 @@ class MedicamentoRepository {
     private val db = FirebaseFirestore.getInstance()
     private val ref = db.collection("medicamentos")
 
+    /**
+     * Guarda o actualiza un medicamento en Firestore.
+     */
     fun guardarMedicamento(
         medicamento: Medicamento,
         onSuccess: () -> Unit,
@@ -19,6 +22,9 @@ class MedicamentoRepository {
             .addOnFailureListener { onFailure(it) }
     }
 
+    /**
+     * Recupera los medicamentos asociados a una enfermedad de un paciente.
+     */
     fun getMedicamentosPorEnfermedadPaciente(
         enfermedadPacienteId: String,
         onResult: (List<Medicamento>) -> Unit
@@ -35,6 +41,9 @@ class MedicamentoRepository {
             }
     }
 
+    /**
+     * Elimina un medicamento por su ID.
+     */
     fun eliminarMedicamento(
         medicamentoId: String,
         onSuccess: () -> Unit,
