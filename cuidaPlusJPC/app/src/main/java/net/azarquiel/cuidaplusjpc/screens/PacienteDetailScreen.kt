@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -31,7 +32,8 @@ import java.util.*
 fun PacienteDetailScreen(
     pacienteId: String,
     viewModel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    padding: PaddingValues = PaddingValues()
 ) {
     var paciente by remember { mutableStateOf<Paciente?>(null) }
 
@@ -41,20 +43,41 @@ fun PacienteDetailScreen(
         }
     }
 
+    val paddingTop = padding.calculateTopPadding()
+    val paddingBottom = padding.calculateBottomPadding()
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = paciente?.nombreCompleto ?: "Paciente", color = MaterialTheme.colorScheme.onPrimary)
-                },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colorResource(R.color.primario))
-            )
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp, bottom = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = null,
+                    tint = colorResource(R.color.secundario),
+                    modifier = Modifier.size(80.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = paciente?.nombreCompleto ?: "Paciente",
+                    color = colorResource(R.color.texto_principal),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         },
         containerColor = colorResource(R.color.fondo_claro)
-    ) { padding ->
+    ) { innerPadding ->
         paciente?.let {
-            PacienteDetailScreenContent(it, padding, viewModel, navController)
-        } ?: Box(modifier = Modifier.padding(padding).fillMaxSize()) {
+            PacienteDetailScreenContent(
+                paciente = it,
+                viewModel = viewModel,
+                navController = navController,
+                paddingTop = paddingTop + innerPadding.calculateTopPadding(),
+                paddingBottom = paddingBottom + innerPadding.calculateBottomPadding()
+            )
+        } ?: Box(modifier = Modifier.fillMaxSize()) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         }
     }
@@ -64,14 +87,13 @@ fun PacienteDetailScreen(
 @Composable
 fun PacienteDetailScreenContent(
     paciente: Paciente,
-    padding: PaddingValues,
     viewModel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    paddingTop: Dp,
+    paddingBottom: Dp
 ) {
-    var expandedEnfermedades by remember { mutableStateOf(true) }
     var showDialogPaciente by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
     val relaciones by viewModel.enfermedadPacienteVM.relaciones.observeAsState(emptyList())
 
     LaunchedEffect(paciente.pacienteId) {
@@ -81,29 +103,27 @@ fun PacienteDetailScreenContent(
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
-            .padding(horizontal = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .padding(top = paddingTop, start = 24.dp, end = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(bottom = paddingBottom + 80.dp)
     ) {
         item {
             Card(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(20.dp),
                 elevation = CardDefaults.cardElevation(6.dp),
                 colors = CardDefaults.cardColors(containerColor = colorResource(R.color.white))
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Text("Datos del paciente", style = MaterialTheme.typography.titleMedium)
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text("Datos del paciente", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Divider()
-                    DatoConIcono(Icons.Default.Person, paciente.nombreCompleto)
-                    DatoConIcono(Icons.Default.Home, paciente.direccion)
-                    DatoConIcono(Icons.Default.Group, paciente.nombreGrupo)
+                    DatoConIcono(Icons.Default.Person, paciente.nombreCompleto, colorResource(R.color.primario))
+                    DatoConIcono(Icons.Default.Home, paciente.direccion, colorResource(R.color.secundario))
+                    DatoConIcono(Icons.Default.Group, paciente.nombreGrupo, colorResource(R.color.terciario))
                     DatoConIcono(
                         Icons.Default.CalendarToday,
-                        SimpleDateFormat("dd/MM/yyyy").format(paciente.fechaNacimiento)
+                        SimpleDateFormat("dd/MM/yyyy").format(paciente.fechaNacimiento),
+                        colorResource(R.color.icono_secundario)
                     )
                     Button(
                         onClick = { showDialogPaciente = true },
@@ -118,104 +138,91 @@ fun PacienteDetailScreenContent(
             }
         }
 
-        // Enfermedades
         item {
             Card(
-                onClick = { expandedEnfermedades = !expandedEnfermedades },
                 modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(4.dp)
+                shape = RoundedCornerShape(20.dp),
+                elevation = CardDefaults.cardElevation(6.dp),
+                colors = CardDefaults.cardColors(containerColor = colorResource(R.color.white))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Enfermedades", style = MaterialTheme.typography.titleMedium)
-                    if (expandedEnfermedades) {
-                        Spacer(Modifier.height(8.dp))
-                        if (relaciones.isEmpty()) {
-                            Text("No tiene enfermedades asignadas.")
-                        } else {
-                            relaciones.forEach { ep ->
-                                Column(modifier = Modifier.padding(start = 8.dp, bottom = 12.dp)) {
-                                    Text("- ${ep.nombre} (${ep.categoria})", fontWeight = FontWeight.SemiBold)
+                    Text("Historial médico", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = colorResource(R.color.texto_principal))
+                    Divider(modifier = Modifier.padding(vertical = 8.dp))
 
-                                    // Cargar tratamientos
-                                    LaunchedEffect(ep.enfermedadPacienteId) {
-                                        viewModel.tratamientoVM.cargarTratamientos(ep.enfermedadPacienteId)
-                                    }
-
-                                    val tratamientos by viewModel.tratamientoVM.tratamientos.observeAsState(emptyList())
-                                    val tratamientosDeEsta = viewModel.tratamientoVM.tratamientosPorEnfermedad[ep.enfermedadPacienteId] ?: emptyList()
-
-                                    if (tratamientosDeEsta.isEmpty()) {
-                                        Text("  No tiene tratamientos asignados.", fontSize = 14.sp, color = Color.Gray)
-                                    } else {
-                                        tratamientosDeEsta.forEach { t ->
-                                            Text("  • ${t.nombre} (${t.tipo})", fontSize = 14.sp, color = MaterialTheme.colorScheme.primary)
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.height(8.dp))
-
-                                    Button(
-                                        onClick = {
-                                            navController.navigate("gestionarTratamientos/${ep.enfermedadPacienteId}")
-                                        },
-                                        modifier = Modifier.align(Alignment.End),
-                                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
-                                    ) {
-                                        Text("Gestionar tratamientos", color = Color.White)
-                                    }
-
-                                    Divider(modifier = Modifier.padding(top = 12.dp))
-                                }
+                    if (relaciones.isEmpty()) {
+                        Text("No tiene enfermedades asignadas.", fontSize = 16.sp, color = Color.Gray)
+                    } else {
+                        relaciones.forEach { ep ->
+                            Column(modifier = Modifier.padding(bottom = 16.dp)) {
+                                Text("• ${ep.nombre}", fontWeight = FontWeight.SemiBold, fontSize = 18.sp)
+                                Text("Categoría: ${ep.categoria}", fontSize = 14.sp, color = Color.DarkGray)
 
                                 LaunchedEffect(ep.enfermedadPacienteId) {
+                                    viewModel.tratamientoVM.cargarTratamientos(ep.enfermedadPacienteId)
                                     viewModel.medicamentoVM.cargarMedicamentos(ep.enfermedadPacienteId)
                                 }
 
+                                val tratamientos = viewModel.tratamientoVM.tratamientosPorEnfermedad[ep.enfermedadPacienteId] ?: emptyList()
                                 val medicamentos = viewModel.medicamentoVM.medicamentosPorEnfermedad[ep.enfermedadPacienteId] ?: emptyList()
 
-                                if (medicamentos.isNotEmpty()) {
-                                    Text("Medicación:")
-                                    medicamentos.forEach {
-                                        Text("  • ${it.nombre} (${it.dosis}, ${it.frecuencia}, ${it.viaAdministracion})", fontSize = 14.sp)
-                                    }
+                                Spacer(Modifier.height(6.dp))
+                                Text("Tratamientos:", fontWeight = FontWeight.Medium, color = colorResource(R.color.secundario))
+                                if (tratamientos.isEmpty()) {
+                                    Text("No tiene tratamientos asignados.", fontSize = 14.sp, color = Color.Gray)
                                 } else {
-                                    Text("  No tiene medicación registrada.", fontSize = 14.sp, color = Color.Gray)
+                                    tratamientos.forEach { t ->
+                                        Text("• ${t.nombre} (${t.tipo})", fontSize = 14.sp)
+                                    }
                                 }
 
                                 Button(
-                                    onClick = {
-                                        navController.navigate("gestionarMedicacion/${ep.enfermedadPacienteId}")
-                                    },
-                                    modifier = Modifier.align(Alignment.End),
+                                    onClick = { navController.navigate("gestionarTratamientos/${ep.enfermedadPacienteId}") },
+                                    modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
                                     colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
                                 ) {
-                                    Text("Gestionar medicación", color = Color.White)
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+                                    Spacer(Modifier.width(6.dp))
+                                    Text("Añadir tratamiento", color = Color.White)
                                 }
 
+                                Spacer(Modifier.height(8.dp))
+                                Text("Medicación:", fontWeight = FontWeight.Medium, color = colorResource(R.color.terciario))
+                                if (medicamentos.isEmpty()) {
+                                    Text("No tiene medicación registrada.", fontSize = 14.sp, color = Color.Gray)
+                                } else {
+                                    medicamentos.forEach {
+                                        Text("• ${it.nombre} (${it.dosis}, ${it.frecuencia}, ${it.viaAdministracion})", fontSize = 14.sp)
+                                    }
+                                }
 
+                                Button(
+                                    onClick = { navController.navigate("gestionarMedicacion/${ep.enfermedadPacienteId}") },
+                                    modifier = Modifier.align(Alignment.End).padding(top = 4.dp),
+                                    colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
+                                ) {
+                                    Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+                                    Spacer(Modifier.width(6.dp))
+                                    Text("Añadir medicación", color = Color.White)
+                                }
+
+                                Divider(modifier = Modifier.padding(top = 16.dp))
                             }
+                        }
+                    }
 
-                        }
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(
-                            onClick = {
-                                navController.navigate("gestionarEnfermedades/${paciente.pacienteId}")
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
-                        ) {
-                            Text("Gestionar enfermedades", color = MaterialTheme.colorScheme.onPrimary)
-                        }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Button(
+                        onClick = { navController.navigate("gestionarEnfermedades/${paciente.pacienteId}") },
+                        modifier = Modifier.align(Alignment.End),
+                        colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
+                    ) {
+                        Icon(Icons.Default.EditNote, contentDescription = null, tint = Color.White)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Gestionar enfermedades", color = Color.White)
                     }
                 }
             }
         }
-
-        // Secciones futuras que aún no están implementadas
-
-
-
-        item { Spacer(modifier = Modifier.height(80.dp)) }
     }
 
     if (showDialogPaciente) {
@@ -238,102 +245,155 @@ fun PacienteDetailScreenContent(
     }
 }
 
+
 @Composable
-fun DatoConIcono(icon: ImageVector, texto: String) {
+fun DatoConIcono(icon: ImageVector, texto: String, tint: Color) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            tint = colorResource(R.color.primario),
-            modifier = Modifier.size(20.dp)
-        )
+        Icon(icon, contentDescription = null, tint = tint, modifier = Modifier.size(22.dp))
         Spacer(modifier = Modifier.width(8.dp))
-        Text(texto)
+        Text(texto, fontSize = 16.sp, color = colorResource(R.color.texto_principal))
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditarPacienteDialog(
     paciente: Paciente,
     onDismiss: () -> Unit,
     onGuardar: (Paciente) -> Unit
 ) {
+    val context = LocalContext.current
+    val formato = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+
     var nombre by remember { mutableStateOf(paciente.nombreCompleto) }
     var direccion by remember { mutableStateOf(paciente.direccion) }
-    var fechaTexto by remember {
-        mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(paciente.fechaNacimiento))
-    }
-    var fechaDate: Date? = paciente.fechaNacimiento
+    var fechaTexto by remember { mutableStateOf(formato.format(paciente.fechaNacimiento)) }
+    var fechaDate by remember { mutableStateOf(paciente.fechaNacimiento) }
     var showDateError by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    if (showDatePicker) {
+        val calendar = Calendar.getInstance().apply { time = fechaDate }
+        android.app.DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                calendar.set(year, month, day, 0, 0, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                fechaDate = calendar.time
+                fechaTexto = formato.format(calendar.time)
+                showDateError = false
+                showDatePicker = false
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(20.dp),
+        containerColor = Color.White,
+        title = {
+            Text(
+                "Editar datos del paciente",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.texto_principal)
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre completo") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Person, contentDescription = null, tint = colorResource(R.color.primario))
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.primario),
+                        unfocusedBorderColor = colorResource(R.color.texto_principal),
+                        cursorColor = colorResource(R.color.primario),
+                        focusedLabelColor = colorResource(R.color.primario)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = direccion,
+                    onValueChange = { direccion = it },
+                    label = { Text("Dirección") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Home, contentDescription = null, tint = colorResource(R.color.primario))
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.primario),
+                        unfocusedBorderColor = colorResource(R.color.texto_principal),
+                        cursorColor = colorResource(R.color.primario),
+                        focusedLabelColor = colorResource(R.color.primario)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = fechaTexto,
+                    onValueChange = {
+                        fechaTexto = it
+                        try {
+                            fechaDate = formato.parse(it)!!
+                            showDateError = false
+                        } catch (e: Exception) {
+                            showDateError = true
+                        }
+                    },
+                    label = { Text("Fecha de nacimiento") },
+                    placeholder = { Text("dd/MM/yyyy") },
+                    isError = showDateError,
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = null, tint = colorResource(R.color.primario))
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.primario),
+                        unfocusedBorderColor = colorResource(R.color.texto_principal),
+                        cursorColor = colorResource(R.color.primario),
+                        focusedLabelColor = colorResource(R.color.primario)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                if (showDateError) {
+                    Text("Introduce una fecha válida (dd/MM/yyyy)", color = Color.Red, fontSize = 12.sp)
+                }
+            }
+        },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
-                    if (nombre.isBlank() || direccion.isBlank() || fechaDate == null) return@TextButton
+                    if (nombre.isBlank() || direccion.isBlank() || fechaDate == null) return@Button
                     val pacienteEditado = paciente.copy(
                         nombreCompleto = nombre,
                         direccion = direccion,
                         fechaNacimiento = fechaDate!!
                     )
                     onGuardar(pacienteEditado)
-                }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
             ) {
-                Text("Guardar", fontSize = 16.sp)
+                Icon(Icons.Default.Save, contentDescription = null, tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Guardar", color = Color.White)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            OutlinedButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = colorResource(R.color.primario))
+            ) {
                 Text("Cancelar", fontSize = 16.sp)
             }
-        },
-        title = {
-            Text("Editar paciente", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre completo") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = direccion,
-                    onValueChange = { direccion = it },
-                    label = { Text("Dirección") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = fechaTexto,
-                    onValueChange = {
-                        fechaTexto = it
-                        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-                            isLenient = false
-                        }
-                        try {
-                            fechaDate = formato.parse(it)
-                            showDateError = false
-                        } catch (e: Exception) {
-                            fechaDate = null
-                            showDateError = true
-                        }
-                    },
-                    label = { Text("Fecha de nacimiento") },
-                    isError = showDateError,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (showDateError) {
-                    Text(
-                        text = "Formato inválido (dd/MM/yyyy)",
-                        color = Color.Red,
-                        fontSize = 12.sp
-                    )
-                }
-            }
-        },
-        shape = RoundedCornerShape(16.dp),
-        containerColor = MaterialTheme.colorScheme.surface
+        }
     )
 }

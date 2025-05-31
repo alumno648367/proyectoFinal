@@ -70,31 +70,29 @@ fun CitasScreen(
     Scaffold(
         topBar = { CitasTopBar(grupo?.nombre ?: "") },
         floatingActionButton = {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(end = 16.dp, bottom = 80.dp), // Ajustado para dejar hueco al bottom nav
-                contentAlignment = Alignment.BottomEnd
+            FloatingActionButton(
+                onClick = { navController.navigate("addCita/$grupoId") },
+                containerColor = colorResource(R.color.secundario),
+                contentColor = Color.White
             ) {
-                FloatingActionButton(
-                    onClick = { navController.navigate("addCita/$grupoId") },
-                    containerColor = colorResource(R.color.secundario),
-                    contentColor = Color.White
-                ) {
-                    Icon(Icons.Default.Add, contentDescription = "Añadir cita")
-                }
+                Icon(Icons.Default.Add, contentDescription = "Añadir cita")
             }
         },
         containerColor = colorResource(R.color.fondo_claro)
     ) { innerPadding ->
-        val combinedPadding = PaddingValues(
-            top = padding.calculateTopPadding() + innerPadding.calculateTopPadding(),
-            bottom = padding.calculateBottomPadding(),
-            start = 24.dp,
-            end = 24.dp
+        CitasContent(
+            citas = citasFiltradas,
+            filtro = filtro,
+            onFiltroChange = { filtro = it },
+            padding = PaddingValues(
+                top = innerPadding.calculateTopPadding(),
+                start = 24.dp,
+                end = 24.dp
+            ),
+            viewModel = viewModel
         )
-        CitasContent(citasFiltradas, filtro, onFiltroChange = { filtro = it }, padding = combinedPadding, viewModel)
     }
+
 }
 
 

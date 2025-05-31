@@ -8,6 +8,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -16,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -25,7 +27,6 @@ import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddPacienteScreen(
     navController: NavHostController,
@@ -34,12 +35,29 @@ fun AddPacienteScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Añadir paciente", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = colorResource(R.color.primario)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null,
+                    tint = colorResource(R.color.primario),
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(top = 16.dp)
                 )
-            )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Añadir paciente",
+                    color = colorResource(R.color.texto_principal),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
         },
         containerColor = colorResource(R.color.fondo_claro)
     ) { innerPadding ->
@@ -94,14 +112,26 @@ fun AddPacienteScreenContent(
             value = nombreCompleto,
             onValueChange = { nombreCompleto = it },
             label = { Text("Nombre completo") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorResource(R.color.primario),
+                unfocusedBorderColor = colorResource(R.color.texto_principal),
+                cursorColor = colorResource(R.color.primario),
+                focusedLabelColor = colorResource(R.color.primario)
+            )
         )
 
         OutlinedTextField(
             value = direccion,
             onValueChange = { direccion = it },
             label = { Text("Dirección") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorResource(R.color.primario),
+                unfocusedBorderColor = colorResource(R.color.texto_principal),
+                cursorColor = colorResource(R.color.primario),
+                focusedLabelColor = colorResource(R.color.primario)
+            )
         )
 
         Row(
@@ -120,8 +150,7 @@ fun AddPacienteScreenContent(
                     } catch (e: Exception) {
                         fechaNacimientoDate = null
                     }
-                }
-                ,
+                },
                 label = { Text("Fecha de nacimiento") },
                 modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
@@ -140,7 +169,6 @@ fun AddPacienteScreenContent(
             }
         }
 
-        // Botón guardar
         Button(
             onClick = {
                 if (nombreCompleto.isBlank() || direccion.isBlank() || fechaNacimientoDate == null || grupo == null) {

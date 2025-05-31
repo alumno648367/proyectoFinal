@@ -1,6 +1,3 @@
-// Archivo: PacientesScreen.kt
-// Descripción: Pantalla de pacientes con topBar fijo, buscador y botón fuera del scroll. Estilo y estructura consistente.
-
 package net.azarquiel.cuidaplusjpc.screens
 
 import android.annotation.SuppressLint

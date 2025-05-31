@@ -3,19 +3,23 @@ package net.azarquiel.cuidaplusjpc.screens
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -58,9 +62,7 @@ fun GestionarMedicacionScreen(
     LaunchedEffect(Unit) {
         snapshotFlow { navController.currentBackStackEntry }
             .filterNotNull()
-            .collectLatest {
-                menuAbierto = ""
-            }
+            .collectLatest { menuAbierto = "" }
     }
 
     BackHandler {
@@ -70,46 +72,82 @@ fun GestionarMedicacionScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Gestionar Medicación", color = MaterialTheme.colorScheme.onPrimary) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colorResource(R.color.primario))
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 16.dp, bottom = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    Icons.Default.MedicalServices,
+                    contentDescription = null,
+                    tint = colorResource(R.color.secundario),
+                    modifier = Modifier.size(80.dp)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    "Gestionar Medicación",
+                    color = colorResource(R.color.texto_principal),
+                    fontSize = 22.sp
+                )
+            }
         },
         containerColor = colorResource(R.color.fondo_claro)
-    ) { padding ->
+    ) { innerPadding ->
         Column(
             modifier = Modifier
-                .padding(padding)
-                .padding(24.dp),
+                // Solo aplicamos el padding superior, no el bottom
+                .padding(top = innerPadding.calculateTopPadding())
+                .padding(horizontal = 24.dp)
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text("Nuevo medicamento", style = MaterialTheme.typography.titleMedium)
 
-            DropdownField("Medicamento", medicamentoSeleccionado, listaMedicamentosMaestro.map { it.nombre }, menuAbierto) {
+            DropdownMedicacion("Medicamento", medicamentoSeleccionado,
+                listaMedicamentosMaestro.map { it.nombre }, menuAbierto) {
                 medicamentoSeleccionado = it
                 menuAbierto = ""
-            }.also { if (menuAbierto != "medicamento") menuAbierto = "" else menuAbierto = "medicamento" }
+            }.also {
+                if (menuAbierto != "medicamento") menuAbierto = ""
+                else menuAbierto = "medicamento"
+            }
 
-            DropdownField("Dosis", dosisSeleccionada, listaDosis, menuAbierto) {
+            DropdownMedicacion("Dosis", dosisSeleccionada, listaDosis, menuAbierto) {
                 dosisSeleccionada = it
                 menuAbierto = ""
-            }.also { if (menuAbierto != "dosis") menuAbierto = "" else menuAbierto = "dosis" }
+            }.also {
+                if (menuAbierto != "dosis") menuAbierto = ""
+                else menuAbierto = "dosis"
+            }
 
-            DropdownField("Frecuencia", frecuenciaSeleccionada, listaFrecuencias, menuAbierto) {
+            DropdownMedicacion("Frecuencia", frecuenciaSeleccionada, listaFrecuencias, menuAbierto) {
                 frecuenciaSeleccionada = it
                 menuAbierto = ""
-            }.also { if (menuAbierto != "frecuencia") menuAbierto = "" else menuAbierto = "frecuencia" }
+            }.also {
+                if (menuAbierto != "frecuencia") menuAbierto = ""
+                else menuAbierto = "frecuencia"
+            }
 
-            DropdownField("Vía de administración", viaSeleccionada, listaVias, menuAbierto) {
+            DropdownMedicacion("Vía de administración", viaSeleccionada, listaVias, menuAbierto) {
                 viaSeleccionada = it
                 menuAbierto = ""
-            }.also { if (menuAbierto != "via") menuAbierto = "" else menuAbierto = "via" }
+            }.also {
+                if (menuAbierto != "via") menuAbierto = ""
+                else menuAbierto = "via"
+            }
 
             OutlinedTextField(
                 value = observaciones,
                 onValueChange = { observaciones = it },
                 label = { Text("Observaciones") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorResource(R.color.primario),
+                    unfocusedBorderColor = colorResource(R.color.texto_principal),
+                    cursorColor = colorResource(R.color.primario),
+                    focusedLabelColor = colorResource(R.color.primario)
+                )
             )
 
             Button(
@@ -143,34 +181,41 @@ fun GestionarMedicacionScreen(
                 Text("Guardar", color = Color.White)
             }
 
-            Divider()
+            Divider(thickness = 1.dp, color = Color.LightGray)
             Text("Medicamentos añadidos", style = MaterialTheme.typography.titleMedium)
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(medicamentos, key = { it.medicamentoId }) { medicamento ->
-                    Card {
-                        Column(modifier = Modifier.padding(12.dp)) {
-                            Text("Nombre: ${medicamento.nombre}")
-                            Text("Dosis: ${medicamento.dosis}")
-                            Text("Frecuencia: ${medicamento.frecuencia}")
-                            Text("Vía: ${medicamento.viaAdministracion}")
-                            if (medicamento.observaciones.isNotBlank())
-                                Text("Obs: ${medicamento.observaciones}")
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End
-                            ) {
-                                IconButton(onClick = {
-                                    viewModel.medicamentoVM.eliminarMedicamento(medicamento.medicamentoId)
-                                }) {
-                                    Icon(Icons.Default.Delete, contentDescription = "Eliminar")
-                                }
+            medicamentos.forEach { medicamento ->
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = colorResource(R.color.color_tarjeta)),
+                    elevation = CardDefaults.cardElevation(4.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text("Nombre: ${medicamento.nombre}")
+                        Text("Dosis: ${medicamento.dosis}")
+                        Text("Frecuencia: ${medicamento.frecuencia}")
+                        Text("Vía: ${medicamento.viaAdministracion}")
+                        if (medicamento.observaciones.isNotBlank())
+                            Text("Observación: ${medicamento.observaciones}")
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.End
+                        ) {
+                            IconButton(onClick = {
+                                viewModel.medicamentoVM.eliminarMedicamento(medicamento.medicamentoId)
+                            }) {
+                                Icon(Icons.Default.Delete, contentDescription = "Eliminar")
                             }
                         }
                     }
                 }
             }
 
+            // Espacio fijo para no solapar el BottomNav
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
@@ -178,7 +223,7 @@ fun GestionarMedicacionScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DropdownField(
+fun DropdownMedicacion(
     label: String,
     selected: String,
     options: List<String>,
@@ -189,23 +234,27 @@ fun DropdownField(
 
     ExposedDropdownMenuBox(
         expanded = menuAbierto == label,
-        onExpandedChange = {
-            expanded = !expanded
-        }
+        onExpandedChange = { expanded = !expanded }
     ) {
-        TextField(
+        OutlinedTextField(
             value = selected,
             onValueChange = {},
-            label = { Text(label) },
             readOnly = true,
+            label = { Text(label) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.menuAnchor().fillMaxWidth()
+            modifier = Modifier
+                .menuAnchor()
+                .fillMaxWidth(),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = colorResource(R.color.primario),
+                unfocusedBorderColor = colorResource(R.color.texto_principal),
+                cursorColor = colorResource(R.color.primario),
+                focusedLabelColor = colorResource(R.color.primario)
+            )
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = {
-                expanded = false
-            }
+            onDismissRequest = { expanded = false }
         ) {
             options.forEach { opt ->
                 DropdownMenuItem(

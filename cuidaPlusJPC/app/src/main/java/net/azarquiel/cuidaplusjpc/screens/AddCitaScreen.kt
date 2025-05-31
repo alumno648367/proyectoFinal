@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.NotificationAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -20,7 +21,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.model.CitaMedica
@@ -46,10 +49,29 @@ fun AddCitaScreen(
     }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Añadir cita", color = Color.White) },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = colorResource(R.color.primario))
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp, bottom = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.NotificationAdd,
+                    contentDescription = null,
+                    tint = colorResource(R.color.primario),
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(top = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Añadir cita",
+                    color = colorResource(R.color.texto_principal),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
         },
         containerColor = colorResource(R.color.fondo_claro)
     ) { innerPadding ->
@@ -145,29 +167,41 @@ fun AddCitaScreenContent(
     ) {
         // Carrusel de pacientes
         if (pacientes.isNotEmpty()) {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = {
-                    if (indicePaciente > 0) indicePaciente--
-                }) {
-                    Icon(Icons.Default.ArrowBackIos, contentDescription = "Anterior")
-                }
                 Text(
-                    text = pacienteSeleccionado?.nombreCompleto ?: "",
-                    style = MaterialTheme.typography.titleMedium
+                    text = "Selecciona un paciente",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colorResource(R.color.texto_principal),
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
-                IconButton(onClick = {
-                    if (indicePaciente < pacientes.lastIndex) indicePaciente++
-                }) {
-                    Icon(Icons.Default.ArrowForwardIos, contentDescription = "Siguiente")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = {
+                        if (indicePaciente > 0) indicePaciente--
+                    }) {
+                        Icon(Icons.Default.ArrowBackIos, contentDescription = "Anterior")
+                    }
+                    Text(
+                        text = pacienteSeleccionado?.nombreCompleto ?: "",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    IconButton(onClick = {
+                        if (indicePaciente < pacientes.lastIndex) indicePaciente++
+                    }) {
+                        Icon(Icons.Default.ArrowForwardIos, contentDescription = "Siguiente")
+                    }
                 }
             }
         } else {
             Text("No hay pacientes disponibles", color = Color.Gray)
         }
+
 
         // Fecha y hora
         Row(
@@ -342,24 +376,35 @@ fun AddCitaScreenContent(
         )
 
         if (usuarios.isNotEmpty()) {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                IconButton(onClick = {
-                    if (indiceUsuario > 0) indiceUsuario--
-                }) {
-                    Icon(Icons.Default.ArrowBackIos, contentDescription = "Anterior")
-                }
                 Text(
-                    text = usuarioSeleccionado?.nombre ?: "",
-                    style = MaterialTheme.typography.titleMedium
+                    text = "Selecciona el usuario que acude",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colorResource(R.color.texto_principal),
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
-                IconButton(onClick = {
-                    if (indiceUsuario < usuarios.lastIndex) indiceUsuario++
-                }) {
-                    Icon(Icons.Default.ArrowForwardIos, contentDescription = "Siguiente")
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    IconButton(onClick = {
+                        if (indiceUsuario > 0) indiceUsuario--
+                    }) {
+                        Icon(Icons.Default.ArrowBackIos, contentDescription = "Anterior")
+                    }
+                    Text(
+                        text = usuarioSeleccionado?.nombre ?: "",
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    IconButton(onClick = {
+                        if (indiceUsuario < usuarios.lastIndex) indiceUsuario++
+                    }) {
+                        Icon(Icons.Default.ArrowForwardIos, contentDescription = "Siguiente")
+                    }
                 }
             }
         } else {
