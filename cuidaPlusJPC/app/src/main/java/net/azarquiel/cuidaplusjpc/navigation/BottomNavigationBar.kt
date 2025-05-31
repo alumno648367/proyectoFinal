@@ -13,6 +13,7 @@ fun BottomNavigationBar(
     navController: NavController,
     grupoId: String?
 ) {
+    // Define las opciones que se muestran en la barra inferior
     val items = listOf(
         BottomNavItem.Perfil,
         BottomNavItem.Grupo,
@@ -21,24 +22,35 @@ fun BottomNavigationBar(
         BottomNavItem.Citas
     )
 
+    // Obtiene la pantalla actual del stack de navegación
     val navBackStackEntry = navController.currentBackStackEntryAsState().value
-    val currentRoute = navBackStackEntry?.destination?.route
 
+    // Contenedor de la barra de navegación inferior
     NavigationBar(containerColor = colorResource(R.color.primario)) {
         items.forEach { item ->
+
+            // Si el botón es el de citas y hay grupo, construye la ruta con ID
             val isCitas = item == BottomNavItem.Citas
             val actualRoute = if (isCitas && grupoId != null) "citas/$grupoId" else item.route
 
+            // Define cada ítem de la barra
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
+
+                // Marca como seleccionado si la ruta actual coincide
                 selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == item.route } == true,
+
+                // Acción al pulsar el ítem: navega a su ruta
                 onClick = {
                     navController.navigate(actualRoute) {
+                        // Evita apilar pantallas duplicadas
                         popUpTo(item.route) { inclusive = true }
                         launchSingleTop = true
                         restoreState = true
                     }
                 },
+
+                // Colores personalizados del ítem
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                     indicatorColor = colorResource(R.color.secundario)
