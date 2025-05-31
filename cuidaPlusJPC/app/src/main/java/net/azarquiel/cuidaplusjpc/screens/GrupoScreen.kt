@@ -2,7 +2,6 @@ package net.azarquiel.cuidaplusjpc.screens
 
 import Usuario
 import android.content.Context
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Group
+import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -37,56 +38,32 @@ import java.util.*
 fun GrupoScreen(navController: NavHostController, viewModel: MainViewModel) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
 
+    // Carga inicial de usuarios y pacientes
     LaunchedEffect(Unit) {
-        if (grupo != null) {
-            viewModel.usuarioVM.obtenerUsuariosPorIds(grupo.miembros)
-            viewModel.pacienteVM.cargarPacientesDelGrupo(grupo.grupoFamiliarId)
+        grupo?.let {
+            viewModel.usuarioVM.obtenerUsuariosPorIds(it.miembros)
+            viewModel.pacienteVM.cargarPacientesDelGrupo(it.grupoFamiliarId)
         }
     }
 
-    Scaffold(
-        topBar = { GrupoTopBar(grupo?.nombre ?: "GRUPO") },
-        containerColor = colorResource(R.color.fondo_claro)
-    ) { padding ->
-        GrupoContent(padding, viewModel, navController)
-    }
-}
-
-@Composable
-fun GrupoTopBar(nombreGrupo: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(R.color.fondo_claro))
-            .padding(top = 24.dp, bottom = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Default.Group,
-            contentDescription = null,
-            tint = colorResource(R.color.primario),
-            modifier = Modifier
-                .size(100.dp)
-                .padding(top = 16.dp)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Grupo: ${nombreGrupo}",
-            color = colorResource(R.color.texto_principal),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold
+    // Scaffold sin color de fondo, topBar eliminado (se integrará en LazyColumn)
+    Scaffold { padding ->
+        GrupoContent(
+            paddingTop = padding.calculateTopPadding(),
+            viewModel = viewModel,
+            navController = navController,
+            grupoNombre = grupo?.nombre ?: "GRUPO"
         )
     }
 }
-
 
 @Composable
 fun GrupoContent(
-    padding: PaddingValues,
+    paddingTop: Dp,
     viewModel: MainViewModel,
-    navController: NavHostController
+    navController: NavHostController,
+    grupoNombre: String
 ) {
-
     val usuarioActual = viewModel.usuarioVM.usuario.observeAsState().value
     val usuarios by viewModel.usuarioVM.usuariosGrupo.observeAsState(emptyList())
     val pacientes by viewModel.pacienteVM.pacientesDelGrupo.observeAsState(emptyList())
@@ -94,10 +71,38 @@ fun GrupoContent(
 
     LazyColumn(
         modifier = Modifier
-            .padding(padding)
-            .padding(16.dp),
+            .fillMaxSize()
+            .background(colorResource(R.color.fondo_claro))
+            .padding(horizontal = 16.dp)
+            .padding(top = paddingTop),
         verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 24.dp, bottom = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Group,
+                    contentDescription = null,
+                    tint = colorResource(R.color.primario),
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(top = 16.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Grupo: $grupoNombre",
+                    color = colorResource(R.color.texto_principal),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+
+        // Lista de miembros
         item {
             SeccionTitulo("MIEMBROS")
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -108,6 +113,7 @@ fun GrupoContent(
             }
         }
 
+        // Lista de pacientes
         item {
             SeccionTitulo("PACIENTES")
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -118,7 +124,10 @@ fun GrupoContent(
             }
         }
 
-        item { Spacer(modifier = Modifier.height(80.dp)) }
+        // Margen inferior para no pisar el BottomNavigationBar
+        item {
+            Spacer(modifier = Modifier.height(50.dp))
+        }
     }
 }
 
@@ -144,8 +153,6 @@ fun CardUsuario(
     navController: NavHostController,
     contexto: Context
 ) {
-    Log.d("GRUPO", "-> mostrando usuario: ${usuario.nombre}")
-
     val esActual = usuario.usuarioId == usuarioActual?.usuarioId
     val bgColor by animateColorAsState(
         targetValue = if (esActual) colorResource(R.color.usuario_actual_tarjeta) else colorResource(R.color.color_tarjeta),
@@ -202,13 +209,25 @@ fun CardPaciente(
         elevation = CardDefaults.cardElevation(6.dp),
         shape = MaterialTheme.shapes.medium
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(paciente.nombreCompleto, fontWeight = FontWeight.Bold)
-            Text(paciente.direccion, fontSize = 14.sp)
-            Text(
-                "Nacimiento: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(paciente.fechaNacimiento)}",
-                fontSize = 13.sp
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.MedicalServices,
+                contentDescription = null,
+                tint = colorResource(R.color.primario),
+                modifier = Modifier.size(24.dp)
             )
+            Spacer(modifier = Modifier.width(12.dp))
+            Column {
+                Text(paciente.nombreCompleto, fontWeight = FontWeight.Bold)
+                Text(paciente.direccion, fontSize = 14.sp)
+                Text(
+                    "Nacimiento: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(paciente.fechaNacimiento)}",
+                    fontSize = 13.sp
+                )
+            }
         }
     }
 }

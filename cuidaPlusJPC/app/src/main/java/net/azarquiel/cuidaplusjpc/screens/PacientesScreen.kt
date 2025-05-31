@@ -1,7 +1,9 @@
+// Archivo: PacientesScreen.kt
+// Descripción: Pantalla de pacientes con topBar fijo, buscador y botón fuera del scroll. Estilo y estructura consistente.
+
 package net.azarquiel.cuidaplusjpc.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -12,10 +14,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -25,6 +24,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -40,18 +40,63 @@ fun PacientesScreen(
     padding: PaddingValues = PaddingValues()
 ) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
+    var filtro by remember { mutableStateOf("") }
 
+    val paddingTop = padding.calculateTopPadding()
+
+    // Scaffold principal con TopBar y fondo de pantalla
     Scaffold(
-        topBar = { PacientesTopBar(grupo?.nombre ?: "Grupo") },
-        containerColor = colorResource(R.color.fondo_claro)
+        containerColor = colorResource(R.color.fondo_claro),
+        topBar = { PacientesTopBar(grupo?.nombre ?: "Grupo") }
     ) { innerPadding ->
-        val combinedPadding = PaddingValues(
-            top = padding.calculateTopPadding() + innerPadding.calculateTopPadding(),
-            bottom = padding.calculateBottomPadding() + innerPadding.calculateBottomPadding(),
-            start = 24.dp,
-            end = 24.dp
-        )
-        PacientesContent(viewModel, navController, combinedPadding)
+        // Contenido principal con filtro, botón y lista
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    top = paddingTop + innerPadding.calculateTopPadding(),
+                    start = 24.dp,
+                    end = 24.dp
+                )
+        ) {
+            // Campo de búsqueda
+            OutlinedTextField(
+                value = filtro,
+                onValueChange = { filtro = it },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                placeholder = { Text("Buscar paciente...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = colorResource(R.color.primario),
+                    unfocusedBorderColor = colorResource(R.color.secundario),
+                    cursorColor = colorResource(R.color.primario),
+                    focusedLeadingIconColor = colorResource(R.color.primario),
+                    unfocusedLeadingIconColor = colorResource(R.color.secundario),
+                    focusedPlaceholderColor = Color.Gray,
+                    unfocusedPlaceholderColor = Color.Gray,
+                    focusedTextColor = colorResource(R.color.texto_principal),
+                    unfocusedTextColor = colorResource(R.color.texto_principal)
+                )
+            )
+
+            // Botón para añadir nuevo paciente
+            Button(
+                onClick = { navController.navigate("addPaciente") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.secundario))
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Añadir paciente", tint = Color.White)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Añadir paciente", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.White)
+            }
+
+            // Lista de pacientes con scroll
+            PacientesLista(viewModel, navController, filtro, bottomPadding = padding.calculateBottomPadding())
+        }
     }
 }
 
@@ -82,74 +127,35 @@ fun PacientesTopBar(nombreGrupo: String) {
 }
 
 @Composable
-fun PacientesContent(
+fun PacientesLista(
     viewModel: MainViewModel,
     navController: NavHostController,
-    padding: PaddingValues
+    filtro: String,
+    bottomPadding: Dp
 ) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
     val pacientes by viewModel.pacienteVM.pacientesDelGrupo.observeAsState(emptyList())
-    var filtro by remember { mutableStateOf("") }
 
-    val pacientesFiltrados = pacientes.filter {
-        it.nombreCompleto.contains(filtro, ignoreCase = true)
-    }
-
+    // Carga inicial de pacientes si hay grupo
     LaunchedEffect(grupo?.grupoFamiliarId) {
         grupo?.let {
             viewModel.pacienteVM.cargarPacientesDelGrupo(it.grupoFamiliarId)
         }
     }
 
+    val pacientesFiltrados = pacientes.filter {
+        it.nombreCompleto.contains(filtro, ignoreCase = true) ||
+                it.direccion.contains(filtro, ignoreCase = true)
+    }
+
+    // Lista con padding inferior ajustado para evitar solapamiento
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        contentPadding = PaddingValues(top = 8.dp, bottom = bottomPadding + 80.dp)
     ) {
-        item {
-            OutlinedTextField(
-                value = filtro,
-                onValueChange = { filtro = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder ={ Text("Buscar paciente...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.secundario),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLeadingIconColor = colorResource(R.color.primario),
-                    unfocusedLeadingIconColor = colorResource(R.color.secundario),
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray,
-                    focusedTextColor = colorResource(R.color.texto_principal),
-                    unfocusedTextColor = colorResource(R.color.texto_principal)
-            )
-            )
-        }
-
-        item {
-            Button(
-                onClick = { navController.navigate("addPaciente") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.secundario))
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir paciente", tint = Color.White)
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Añadir paciente",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = Color.White
-                )
-            }
-        }
-
         items(pacientesFiltrados) { paciente ->
             PacienteCard(paciente, navController)
-        }
-
-        item {
-            Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
@@ -160,15 +166,18 @@ fun PacienteCard(
     paciente: Paciente,
     navController: NavHostController
 ) {
+    // Cálculo de edad basado en el año actual
     val edad = Calendar.getInstance().get(Calendar.YEAR) -
             Calendar.getInstance().apply { time = paciente.fechaNacimiento }.get(Calendar.YEAR)
 
+    // Animación de escala al pulsar
     var pressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (pressed) 0.96f else 1f,
         animationSpec = tween(durationMillis = 200), label = "scaleAnim"
     )
 
+    // Tarjeta individual del paciente
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -187,11 +196,34 @@ fun PacienteCard(
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Text(paciente.nombreCompleto, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = colorResource(R.color.texto_principal))
-            Text("$edad años", color = Color.DarkGray)
-            Text("Dirección: ${paciente.direccion}", color = Color.DarkGray)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Person, contentDescription = null, tint = colorResource(R.color.primario), modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(paciente.nombreCompleto, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = colorResource(R.color.texto_principal))
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Cake, contentDescription = null, tint = colorResource(R.color.secundario), modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Text("$edad años", fontSize = 16.sp, color = Color.DarkGray)
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Icon(Icons.Default.Place, contentDescription = null, tint = colorResource(R.color.terciario), modifier = Modifier.size(20.dp))
+                Spacer(modifier = Modifier.width(12.dp))
+                Text("Dirección: ${paciente.direccion}", fontSize = 16.sp, color = Color.DarkGray)
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 package net.azarquiel.cuidaplusjpc.screens
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,6 +31,7 @@ import net.azarquiel.cuidaplusjpc.R
 import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun LoginUsuarioScreen(navController: NavHostController, viewModel: MainViewModel) {
     LoginUsuarioContent(navController, viewModel)
@@ -40,15 +42,14 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
     val context = LocalContext.current
     val clientId = stringResource(id = R.string.default_web_client_id)
 
+    // Configuración para login con Google
     val gso = remember {
         GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestIdToken(clientId)
             .requestEmail()
             .build()
     }
-    val googleSignInClient = remember {
-        GoogleSignIn.getClient(context, gso)
-    }
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -59,6 +60,10 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             viewModel.loginConGoogle(account.idToken ?: "",
                 onSuccess = {
                     Toast.makeText(context, "Sesión iniciada con Google", Toast.LENGTH_SHORT).show()
+                    navController.navigate("inicio") {
+                        popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 },
                 onFailure = {
                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -69,6 +74,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
         }
     }
 
+    // Estados del formulario
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var showEmailError by remember { mutableStateOf(false) }
@@ -82,26 +88,24 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Encabezado visual
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Usuario",
-                tint = colorResource(R.color.primario),
-                modifier = Modifier.size(80.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = "Inicia sesión",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.texto_principal)
-            )
-        }
+        // Cabecera igual que en registro
+        Icon(
+            imageVector = Icons.Default.Person,
+            contentDescription = "Usuario",
+            tint = colorResource(R.color.primario),
+            modifier = Modifier.size(80.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Inicia sesión",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(R.color.texto_principal)
+        )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Email
+        // Campo email
         OutlinedTextField(
             value = email,
             onValueChange = {
@@ -121,7 +125,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             )
         )
 
-        // Contraseña
+        // Campo contraseña
         OutlinedTextField(
             value = password,
             onValueChange = {
@@ -133,9 +137,8 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = icon, contentDescription = description)
+                    Icon(imageVector = icon, contentDescription = "Mostrar/Ocultar")
                 }
             },
             modifier = Modifier
@@ -154,7 +157,6 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             onClick = {
                 val emailOk = email.isNotBlank()
                 val passwordOk = password.isNotBlank()
-
                 showEmailError = !emailOk
                 showPasswordError = !passwordOk
 
@@ -172,7 +174,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
                         }
                     )
                 } else {
-                    Toast.makeText(context, "Introduce email y contraseña", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Rellena todos los campos", Toast.LENGTH_SHORT).show()
                 }
             },
             modifier = Modifier
@@ -188,12 +190,12 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Recuperar contraseña
+        // Botón recuperación contraseña
         TextButton(onClick = {
             if (email.isBlank()) {
                 Toast.makeText(context, "Introduce tu email para recuperar la contraseña", Toast.LENGTH_SHORT).show()
             } else {
-                viewModel.recuperarPassword(email) { success, message ->
+                viewModel.recuperarPassword(email) { _, message ->
                     Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
                 }
             }
@@ -207,7 +209,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Google Sign-In
+        // Botón Google
         Button(
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent

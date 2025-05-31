@@ -8,22 +8,18 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.Medication
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -33,73 +29,30 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun MiCuentaScreen(
-    navController: NavHostController,
-    viewModel: MainViewModel
-) {
+fun MiCuentaScreen(navController: NavHostController, viewModel: MainViewModel) {
     val grupo by viewModel.grupoVM.grupo.observeAsState()
 
     Scaffold(
-        topBar = {
-            Box {
-                IconButton(
-                    onClick = { navController.popBackStack() },
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(8.dp)
-                ) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Atrás")
-                }
-                MiCuentaTopBar(grupoNombre = grupo?.nombre)
-            }
-        },
-        containerColor = colorResource(R.color.fondo_claro)
-    ) { innerPadding ->
-        // Aquí aplicamos el innerPadding de la Scaffold
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-        ) {
-            MiCuentaContent(viewModel)
-        }
-    }
-}
-
-@Composable
-fun MiCuentaTopBar(grupoNombre: String?, logoRes: Int = R.drawable.logosinfondo) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(colorResource(R.color.fondo_claro))
-            .padding(vertical = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Image(
-            painter = painterResource(logoRes),
-            contentDescription = "Logo Cuida+",
-            modifier = Modifier.size(120.dp)
-        )
-        Spacer(Modifier.height(8.dp))
-        Text(
-            text = grupoNombre.orEmpty(),
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = colorResource(R.color.texto_principal)
+    ) { padding ->
+        // Pasamos el topPadding para respetar el espacio del sistema
+        MiCuentaContent(
+            viewModel = viewModel,
+            grupoNombre = grupo?.nombre,
+            paddingTop = padding.calculateTopPadding()
         )
     }
 }
 
 @SuppressLint("SimpleDateFormat")
 @Composable
-private fun MiCuentaContent(viewModel: MainViewModel) {
+fun MiCuentaContent(viewModel: MainViewModel, grupoNombre: String?, paddingTop: Dp) {
     val pacientes by viewModel.pacienteVM.pacientesDelGrupo.observeAsState(emptyList())
     val enfermedadesPorPaciente by viewModel.enfermedadPacienteVM.enfermedadesPorPaciente.observeAsState(emptyMap())
     val citas = viewModel.citaVM.citas
     val tratamientosPorEnfermedad = viewModel.tratamientoVM.tratamientosPorEnfermedad
     val medicamentosPorEnfermedad = viewModel.medicamentoVM.medicamentosPorEnfermedad
 
-    // Cargas
+    // Carga de datos al entrar en la pantalla
     LaunchedEffect(viewModel.grupoVM.grupo.value?.grupoFamiliarId) {
         viewModel.grupoVM.grupo.value?.let {
             viewModel.pacienteVM.escucharPacientesDelGrupo(it.grupoFamiliarId)
@@ -117,13 +70,39 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
         }
     }
 
+    // Scroll general con padding lateral y superior
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            // margen lateral y vertical sencillo
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .background(colorResource(R.color.fondo_claro))
+            .padding(horizontal = 24.dp)
+            .padding(top = paddingTop),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        // Top visual con el logo y nombre del grupo
+        item {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.logosinfondo),
+                    contentDescription = "Logo Cuida+",
+                    modifier = Modifier.size(120.dp)
+                )
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = grupoNombre.orEmpty(),
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorResource(R.color.texto_principal)
+                )
+            }
+        }
+
+        // Título sección
         item {
             Text(
                 text = "Pacientes",
@@ -132,6 +111,8 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
                 color = colorResource(R.color.texto_principal)
             )
         }
+
+        // Tarjetas por cada paciente
         items(pacientes) { p ->
             Card(
                 modifier = Modifier.fillMaxWidth(),
@@ -140,7 +121,6 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
                 colors = CardDefaults.cardColors(containerColor = colorResource(R.color.color_tarjeta))
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    // Nombre del paciente
                     Text(
                         text = p.nombreCompleto,
                         fontSize = 20.sp,
@@ -149,14 +129,10 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
                         modifier = Modifier.padding(bottom = 12.dp)
                     )
 
-                    // —— Enfermedades ——
+                    // Enfermedades
                     enfermedadesPorPaciente[p.pacienteId]?.let { enfList ->
                         if (enfList.isNotEmpty()) {
-                            InfoRow(
-                                icon = Icons.Default.LocalHospital,
-                                label = "Enfermedades",
-                                iconTint = colorResource(R.color.primario)
-                            )
+                            InfoRow(Icons.Default.LocalHospital, "Enfermedades", colorResource(R.color.primario))
                             enfList.forEach { e ->
                                 Text(
                                     text = "• ${e.nombre} (${e.estado})",
@@ -166,15 +142,11 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
                         }
                     }
 
-                    // —— Tratamientos ——
+                    // Tratamientos
                     enfermedadesPorPaciente[p.pacienteId]?.forEach { e ->
                         tratamientosPorEnfermedad[e.enfermedadPacienteId]?.let { trts ->
                             if (trts.isNotEmpty()) {
-                                InfoRow(
-                                    icon = Icons.Default.MedicalServices,
-                                    label = "Tratamientos",
-                                    iconTint = colorResource(R.color.secundario)
-                                )
+                                InfoRow(Icons.Default.MedicalServices, "Tratamientos", colorResource(R.color.secundario))
                                 trts.forEach { t ->
                                     Text(
                                         text = "• ${t.nombre} (${t.tipo})",
@@ -184,14 +156,10 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
                             }
                         }
 
-                        // —— Medicación ——
+                        // Medicamentos
                         medicamentosPorEnfermedad[e.enfermedadPacienteId]?.let { meds ->
                             if (meds.isNotEmpty()) {
-                                InfoRow(
-                                    icon = Icons.Default.Medication,
-                                    label = "Medicaciones",
-                                    iconTint = colorResource(R.color.icono_secundario)
-                                )
+                                InfoRow(Icons.Default.Medication, "Medicaciones", colorResource(R.color.icono_secundario))
                                 meds.forEach { m ->
                                     Text(
                                         text = "• ${m.nombre}, ${m.dosis}, cada ${m.frecuencia}",
@@ -202,16 +170,12 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
                         }
                     }
 
-                    // —— Citas ——
+                    // Citas
                     val fmt = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                     val citasPac = citas.filter { it.pacienteId == p.pacienteId }
                     if (citasPac.isNotEmpty()) {
                         Spacer(Modifier.height(8.dp))
-                        InfoRow(
-                            icon = Icons.Default.Place,
-                            label = "Citas",
-                            iconTint = colorResource(R.color.terciario)
-                        )
+                        InfoRow(Icons.Default.Place, "Citas", colorResource(R.color.terciario))
                         citasPac.forEach {
                             Text(
                                 text = "• ${fmt.format(it.fechaHora)}: ${it.especialidad} con ${it.medico}",
@@ -221,11 +185,15 @@ private fun MiCuentaContent(viewModel: MainViewModel) {
                     }
                 }
             }
-
         }
-        item { Spacer(Modifier.height(80.dp)) } // espacio final sobre nav
+
+        // Espacio final para no chocar con bottom nav
+        item {
+            Spacer(modifier = Modifier.height(80.dp))
+        }
     }
 }
+
 @Composable
 fun InfoRow(
     icon: ImageVector,

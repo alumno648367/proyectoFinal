@@ -1,15 +1,19 @@
 package net.azarquiel.cuidaplusjpc.screens
 
 import Usuario
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -19,21 +23,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.google.firebase.auth.FirebaseAuth
 import net.azarquiel.cuidaplusjpc.R
-import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
 fun PerfilScreen(navController: NavHostController, viewModel: MainViewModel) {
-    Scaffold(
-        containerColor = colorResource(R.color.fondo_claro)
-    ) { paddingValues ->
+    Scaffold{ paddingValues ->
         PerfilScreenContent(
             padding = paddingValues,
             viewModel = viewModel,
@@ -56,12 +57,14 @@ fun PerfilScreenContent(
 
         LazyColumn(
             modifier = Modifier
+                .background(color = colorResource(R.color.fondo_claro))
                 .fillMaxSize()
-                .padding(padding)
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = 24.dp)
+                .padding(top = padding.calculateTopPadding()),
             verticalArrangement = Arrangement.spacedBy(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Icono de perfil
             item {
                 Icon(
                     imageVector = Icons.Default.AccountCircle,
@@ -73,10 +76,12 @@ fun PerfilScreenContent(
                 )
             }
 
+            // Saludo con el nombre del usuario
             item {
                 Text("Hola, ${user.nombre}", fontSize = 24.sp, fontWeight = FontWeight.Bold)
             }
 
+            // Card con los datos del usuario
             item {
                 Card(
                     modifier = Modifier.fillMaxWidth(),
@@ -98,6 +103,7 @@ fun PerfilScreenContent(
                             SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(user.fechaNacimiento)
                         )
 
+                        // Botón para editar datos
                         Button(
                             onClick = { showDialog = true },
                             modifier = Modifier.align(Alignment.End),
@@ -111,28 +117,52 @@ fun PerfilScreenContent(
                 }
             }
 
+            // Card para cerrar sesión
             item {
-                OutlinedButton(
-                    onClick = { viewModel.cerrarSesion(navController) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorResource(R.color.primario),
-                        contentColor = colorResource(R.color.texto_principal)
-                    )
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(20.dp),
+                    elevation = CardDefaults.cardElevation(6.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Text("Cerrar sesión", fontSize = 16.sp)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "¿Quieres cerrar sesión?",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = colorResource(R.color.texto_principal)
+                        )
+
+                        // Botón para cerrar sesión
+                        Button(
+                            onClick = { viewModel.cerrarSesion(navController) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = colorResource(R.color.primario),
+                                contentColor = colorResource(R.color.fondo_claro)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Text("Cerrar sesión", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        }
+                    }
                 }
-
-
             }
 
+            // Spacer para dar margen inferior exacto debajo del BottomNavigationBar
             item {
-                Spacer(modifier = Modifier.height(100.dp)) // Espacio extra para evitar que el contenido quede tapado
+                Spacer(modifier = Modifier.height(padding.calculateBottomPadding()))
             }
         }
 
+        // Diálogo para editar los datos del usuario
         if (showDialog) {
             EditarUsuarioDialog(
                 usuario = user,
@@ -157,7 +187,6 @@ fun PerfilScreenContent(
     }
 }
 
-
 @Composable
 fun FieldItem(label: String, value: String) {
     Column(
@@ -170,90 +199,148 @@ fun FieldItem(label: String, value: String) {
         Text(text = value, fontSize = 18.sp, fontWeight = FontWeight.Medium)
     }
 }
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditarUsuarioDialog(
     usuario: Usuario,
     onDismiss: () -> Unit,
     onGuardar: (Usuario) -> Unit
 ) {
+    val context = LocalContext.current
+    val formato = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
+
     var nombre by remember { mutableStateOf(usuario.nombre) }
     var telefono by remember { mutableStateOf(usuario.numTelefono.toString()) }
-    var fechaTexto by remember {
-        mutableStateOf(SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(usuario.fechaNacimiento))
-    }
-    var fechaDate: Date? = usuario.fechaNacimiento
+    var fechaTexto by remember { mutableStateOf(formato.format(usuario.fechaNacimiento)) }
+    var fechaDate by remember { mutableStateOf(usuario.fechaNacimiento) }
     var showDateError by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // Lógica para lanzar el selector de fecha
+    if (showDatePicker) {
+        val calendar = Calendar.getInstance().apply { time = fechaDate }
+        android.app.DatePickerDialog(
+            context,
+            { _, year, month, day ->
+                calendar.set(year, month, day, 0, 0, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                fechaDate = calendar.time
+                fechaTexto = formato.format(calendar.time)
+                showDateError = false
+                showDatePicker = false
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).show()
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        shape = RoundedCornerShape(20.dp),
+        containerColor = Color.White,
+        title = {
+            Text(
+                "Editar datos personales",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.texto_principal)
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                OutlinedTextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Person, contentDescription = null, tint = colorResource(R.color.primario))
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.primario),
+                        unfocusedBorderColor = colorResource(R.color.texto_principal),
+                        cursorColor = colorResource(R.color.primario),
+                        focusedLabelColor = colorResource(R.color.primario)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = telefono,
+                    onValueChange = { telefono = it },
+                    label = { Text("Teléfono") },
+                    leadingIcon = {
+                        Icon(Icons.Default.Phone, contentDescription = null, tint = colorResource(R.color.primario))
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.primario),
+                        unfocusedBorderColor = colorResource(R.color.texto_principal),
+                        cursorColor = colorResource(R.color.primario),
+                        focusedLabelColor = colorResource(R.color.primario)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = fechaTexto,
+                    onValueChange = {
+                        fechaTexto = it
+                        try {
+                            fechaDate = formato.parse(it)!!
+                            showDateError = false
+                        } catch (e: Exception) {
+                            showDateError = true
+                        }
+                    },
+                    label = { Text("Fecha de nacimiento") },
+                    placeholder = { Text("dd/MM/yyyy") },
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    isError = showDateError,
+                    trailingIcon = {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Default.CalendarToday, contentDescription = null, tint = colorResource(R.color.primario))
+                        }
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = colorResource(R.color.primario),
+                        unfocusedBorderColor = colorResource(R.color.texto_principal),
+                        cursorColor = colorResource(R.color.primario),
+                        focusedLabelColor = colorResource(R.color.primario)
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
+                if (showDateError) {
+                    Text("Introduce una fecha válida (dd/MM/yyyy)", color = Color.Red, fontSize = 12.sp)
+                }
+            }
+        },
         confirmButton = {
-            TextButton(
+            Button(
                 onClick = {
                     val telefonoLong = telefono.toLongOrNull()
-                    if (nombre.isBlank() || telefonoLong == null || fechaDate == null) return@TextButton
+                    if (nombre.isBlank() || telefonoLong == null || fechaDate == null) return@Button
                     val usuarioEditado = usuario.copy(
                         nombre = nombre,
                         numTelefono = telefonoLong,
                         fechaNacimiento = fechaDate!!
                     )
                     onGuardar(usuarioEditado)
-                }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
             ) {
-                Text("Guardar", fontSize = 16.sp)
+                Text("Guardar", color = Color.White, fontSize = 16.sp)
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            OutlinedButton(
+                onClick = onDismiss,
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = colorResource(R.color.primario))
+            ) {
                 Text("Cancelar", fontSize = 16.sp)
             }
-        },
-        title = {
-            Text("Editar datos personales", fontSize = 20.sp, fontWeight = FontWeight.Bold)
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                OutlinedTextField(
-                    value = nombre,
-                    onValueChange = { nombre = it },
-                    label = { Text("Nombre") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = telefono,
-                    onValueChange = { telefono = it },
-                    label = { Text("Teléfono") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                OutlinedTextField(
-                    value = fechaTexto,
-                    onValueChange = {
-                        fechaTexto = it
-                        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
-                            isLenient = false
-                        }
-                        try {
-                            fechaDate = formato.parse(it)
-                            showDateError = false
-                        } catch (e: Exception) {
-                            fechaDate = null
-                            showDateError = true
-                        }
-                    },
-                    label = { Text("Fecha de nacimiento") },
-                    isError = showDateError,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (showDateError) {
-                    Text(
-                        text = "Introduce una fecha válida (dd/MM/yyyy)",
-                        color = Color.Red,
-                        fontSize = 12.sp
-                    )
-                }
-            }
-        },
-        shape = RoundedCornerShape(16.dp),
-        containerColor = MaterialTheme.colorScheme.surface
+        }
     )
 }
+
