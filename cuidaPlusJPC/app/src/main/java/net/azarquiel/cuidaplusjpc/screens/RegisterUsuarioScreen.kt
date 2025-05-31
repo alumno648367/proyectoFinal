@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -46,9 +47,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             .requestEmail()
             .build()
     }
-    val googleSignInClient = remember {
-        GoogleSignIn.getClient(context, gso)
-    }
+    val googleSignInClient = remember { GoogleSignIn.getClient(context, gso) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -83,15 +82,24 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Icono y título
         Icon(
             imageVector = Icons.Default.Person,
             contentDescription = "Usuario",
             tint = colorResource(R.color.primario),
-            modifier = Modifier
-                .size(100.dp)
-                .padding(bottom = 32.dp)
+            modifier = Modifier.size(80.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Crear una cuenta",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorResource(R.color.texto_principal)
         )
 
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Campo Email
         OutlinedTextField(
             value = email,
             onValueChange = {
@@ -111,6 +119,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             )
         )
 
+        // Campo Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = {
@@ -122,10 +131,8 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
                 val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Icon(imageVector = icon, contentDescription = description)
+                    Icon(imageVector = icon, contentDescription = "Mostrar/Ocultar")
                 }
             },
             modifier = Modifier
@@ -139,7 +146,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             )
         )
 
-
+        // Términos legales
         Text(
             text = "Al registrarte, aceptas la Política de privacidad y los Términos de servicio",
             fontSize = 12.sp,
@@ -148,6 +155,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
+        // Botón Registrar
         Button(
             onClick = {
                 val emailOk = email.isNotBlank()
@@ -172,17 +180,18 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
+                .height(56.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(R.color.primario),
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text("Crear cuenta", fontSize = 16.sp)
+            Text("Crear cuenta", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // Google Sign-In
         Button(
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent
@@ -203,7 +212,7 @@ fun RegisterUsuarioContent(navController: NavHostController, viewModel: MainView
                 modifier = Modifier.size(35.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Continuar con Google")
+            Text("Continuar con Google", fontSize = 16.sp)
         }
     }
 }

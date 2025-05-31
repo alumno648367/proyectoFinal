@@ -25,18 +25,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun RegisterCompletoScreen(
-    navController: NavHostController,
-    viewModel: MainViewModel
-) {
+fun RegisterCompletoScreen(navController: NavHostController, viewModel: MainViewModel) {
     Scaffold(
         topBar = { RegisterCompletoTopBar() },
-        containerColor = colorResource(R.color.fondo_claro),
-        content = { padding ->
-            RegisterCompletoContent(padding, viewModel, navController)
-        }
-    )
+        containerColor = colorResource(R.color.fondo_claro)
+    ) { padding ->
+        RegisterCompletoContent(padding, viewModel, navController)
+    }
 }
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterCompletoTopBar() {
@@ -65,250 +62,115 @@ fun RegisterCompletoTopBar() {
 }
 
 @Composable
-fun RegisterCompletoContent(
-    padding: PaddingValues,
-    viewModel: MainViewModel,
-    navController: NavHostController
-) {
-    val usuarioVM = viewModel.usuarioVM
-    val grupoVM = viewModel.grupoVM
+fun RegisterCompletoContent(padding: PaddingValues, viewModel: MainViewModel, navController: NavHostController) {
     val context = LocalContext.current
     val auth = FirebaseAuth.getInstance()
     val currentUser = auth.currentUser
-
     val email = currentUser?.email ?: ""
     val uid = currentUser?.uid ?: return
+
+    val calendar = remember { Calendar.getInstance() }
+    val formato = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
 
     var nombre by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var fechaNacimientoTexto by remember { mutableStateOf("") }
     var fechaNacimientoDate by remember { mutableStateOf<Date?>(null) }
 
-    val calendar = Calendar.getInstance()
-    val datePicker = DatePickerDialog(
-        context,
-        { _, year, month, day ->
+    val datePicker = remember {
+        DatePickerDialog(context, { _, year, month, day ->
             calendar.set(year, month, day, 0, 0, 0)
             calendar.set(Calendar.MILLISECOND, 0)
             fechaNacimientoDate = calendar.time
-            val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            fechaNacimientoTexto = formato.format(fechaNacimientoDate!!)
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH),
-    )
+            fechaNacimientoTexto = formato.format(calendar.time)
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
+    }
 
     var opcionGrupo by remember { mutableStateOf("crear") }
     var nombreGrupo by remember { mutableStateOf("") }
     var nombreGrupoExistente by remember { mutableStateOf("") }
+    var isGuardando by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .padding(24.dp),
+            .padding(horizontal = 24.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.Top
     ) {
-        OutlinedTextField(
-            value = email,
-            onValueChange = {},
-            label = { Text("Email") },
-            enabled = false,
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.primario),
-                unfocusedBorderColor = colorResource(R.color.texto_principal),
-                cursorColor = colorResource(R.color.primario),
-                focusedLabelColor = colorResource(R.color.primario)
-            )
-        )
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.primario),
-                unfocusedBorderColor = colorResource(R.color.texto_principal),
-                cursorColor = colorResource(R.color.primario),
-                focusedLabelColor = colorResource(R.color.primario)
-            )
-        )
-        OutlinedTextField(
-            value = telefono,
-            onValueChange = { telefono = it },
-            label = { Text("Teléfono") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.primario),
-                unfocusedBorderColor = colorResource(R.color.texto_principal),
-                cursorColor = colorResource(R.color.primario),
-                focusedLabelColor = colorResource(R.color.primario)
-            )
-        )
+        CampoSoloLectura(label = "Email", value = email)
+        CampoTexto(label = "Nombre", value = nombre, onValueChange = { nombre = it })
+        CampoTexto(label = "Teléfono", value = telefono, onValueChange = { telefono = it })
 
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        ) {
-            OutlinedTextField(
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            CampoTexto(
+                label = "Fecha de nacimiento",
                 value = fechaNacimientoTexto,
                 onValueChange = {
                     fechaNacimientoTexto = it
-                    val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    try {
-                        fechaNacimientoDate = formato.parse(it)
-                    } catch (e: Exception) {
-                        fechaNacimientoDate = null
-                    }
-                }
-                ,
-                label = { Text("Fecha de nacimiento") },
-                modifier = Modifier.weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.texto_principal),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLabelColor = colorResource(R.color.primario)
-                )
+                    fechaNacimientoDate = formato.parse(it)
+                },
+                modifier = Modifier.weight(1f)
             )
             IconButton(onClick = { datePicker.show() }) {
-                Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = "Seleccionar fecha",
-                    tint = colorResource(R.color.primario)
-                )
+                Icon(Icons.Default.CalendarToday, contentDescription = null, tint = colorResource(R.color.primario))
             }
         }
 
         Spacer(modifier = Modifier.height(8.dp))
-
         Text("Selecciona una opción:", fontSize = 14.sp)
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(24.dp)
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = opcionGrupo == "crear",
-                    onClick = { opcionGrupo = "crear" },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = colorResource(R.color.primario)
-                    )
-                )
-                Text("Crear grupo")
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(
-                    selected = opcionGrupo == "unirse",
-                    onClick = { opcionGrupo = "unirse" },
-                    colors = RadioButtonDefaults.colors(
-                        selectedColor = colorResource(R.color.primario)
-                    )
-                )
-                Text("Unirse a grupo")
-            }
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+            RadioOpcion(text = "Crear grupo", seleccionado = opcionGrupo == "crear") { opcionGrupo = "crear" }
+            RadioOpcion(text = "Unirse a grupo", seleccionado = opcionGrupo == "unirse") { opcionGrupo = "unirse" }
         }
 
-
         if (opcionGrupo == "crear") {
-            OutlinedTextField(
-                value = nombreGrupo,
-                onValueChange = { nombreGrupo = it },
-                label = { Text("Nombre del grupo") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.texto_principal),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLabelColor = colorResource(R.color.primario)
-                )
-            )
+            CampoTexto(label = "Nombre del grupo", value = nombreGrupo, onValueChange = { nombreGrupo = it })
         } else {
-            OutlinedTextField(
-                value = nombreGrupoExistente,
-                onValueChange = { nombreGrupoExistente = it },
-                label = { Text("Nombre del grupo") },
-                modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.texto_principal),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLabelColor = colorResource(R.color.primario)
-                )
-            )
+            CampoTexto(label = "Nombre del grupo", value = nombreGrupoExistente, onValueChange = { nombreGrupoExistente = it })
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-        var isGuardando by remember { mutableStateOf(false) }
         Button(
             onClick = {
                 if (isGuardando) return@Button
                 val telefonoLong = telefono.toLongOrNull()
                 if (nombre.isBlank() || telefonoLong == null || fechaNacimientoDate == null) {
-                    Toast.makeText(
-                        context,
-                        "Rellena todos los campos correctamente",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(context, "Rellena todos los campos correctamente", Toast.LENGTH_LONG).show()
                     return@Button
                 }
-
                 isGuardando = true
-                val usuario = Usuario(
-                    usuarioId = uid,
-                    nombre = nombre,
-                    email = email,
-                    numTelefono = telefonoLong,
-                    fechaNacimiento = fechaNacimientoDate!!
-                )
-
+                val usuario = Usuario(uid, nombre, fechaNacimientoDate!!, email, telefonoLong, emptyList())
                 if (opcionGrupo == "crear") {
-                    viewModel.crearGrupoYUsuario(nombreGrupo, uid, usuario,
-                        onSuccess = {
-                            isGuardando = false
-                            Toast.makeText(context, "Usuario y grupo creados", Toast.LENGTH_SHORT)
-                                .show()
-                            viewModel.usuarioVM.empezarEscucha(uid)
-                            navController.navigate("inicio") {
-                                popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        },
-                        onFailure = {
-                            isGuardando = false
-                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    viewModel.crearGrupoYUsuario(nombreGrupo, uid, usuario, {
+                        isGuardando = false
+                        Toast.makeText(context, "Usuario y grupo creados", Toast.LENGTH_SHORT).show()
+                        viewModel.usuarioVM.empezarEscucha(uid)
+                        navController.navigate("inicio") {
+                            popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
+                            launchSingleTop = true
                         }
-                    )
+                    }, {
+                        isGuardando = false
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    })
                 } else {
-                    viewModel.unirseAGrupoPorNombre(nombreGrupoExistente, uid, usuario,
-                        onSuccess = {
-                            isGuardando = false
-                            Toast.makeText(context, "Usuario unido al grupo", Toast.LENGTH_SHORT).show()
-                            viewModel.usuarioVM.empezarEscucha(uid)
-                            navController.navigate("inicio") {
-                                popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
-                                launchSingleTop = true
-                            }
-                        },
-                        onFailure = {
-                            isGuardando = false
-                            Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    viewModel.unirseAGrupoPorNombre(nombreGrupoExistente, uid, usuario, {
+                        isGuardando = false
+                        Toast.makeText(context, "Usuario unido al grupo", Toast.LENGTH_SHORT).show()
+                        viewModel.usuarioVM.empezarEscucha(uid)
+                        navController.navigate("inicio") {
+                            popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
+                            launchSingleTop = true
                         }
-                    )
+                    }, {
+                        isGuardando = false
+                        Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                    })
                 }
             },
             enabled = !isGuardando,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(R.color.primario),
                 contentColor = colorResource(R.color.fondo_claro)
@@ -316,5 +178,51 @@ fun RegisterCompletoContent(
         ) {
             Text("Guardar")
         }
+    }
+}
+
+@Composable
+fun CampoTexto(label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier.fillMaxWidth()) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorResource(R.color.primario),
+            unfocusedBorderColor = colorResource(R.color.texto_principal),
+            cursorColor = colorResource(R.color.primario),
+            focusedLabelColor = colorResource(R.color.primario)
+        )
+    )
+}
+
+@Composable
+fun CampoSoloLectura(label: String, value: String) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = {},
+        label = { Text(label) },
+        enabled = false,
+        modifier = Modifier.fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = colorResource(R.color.primario),
+            unfocusedBorderColor = colorResource(R.color.texto_principal),
+            disabledLabelColor = colorResource(R.color.texto_principal),
+            disabledBorderColor = colorResource(R.color.texto_principal),
+            disabledTextColor = colorResource(R.color.texto_principal)
+        )
+    )
+}
+
+@Composable
+fun RadioOpcion(text: String, seleccionado: Boolean, onClick: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        RadioButton(
+            selected = seleccionado,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(selectedColor = colorResource(R.color.primario))
+        )
+        Text(text)
     }
 }

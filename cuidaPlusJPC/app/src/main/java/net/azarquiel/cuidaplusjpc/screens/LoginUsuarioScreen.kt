@@ -17,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -37,7 +38,6 @@ fun LoginUsuarioScreen(navController: NavHostController, viewModel: MainViewMode
 @Composable
 fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewModel) {
     val context = LocalContext.current
-    val usuarioVM = viewModel.usuarioVM
     val clientId = stringResource(id = R.string.default_web_client_id)
 
     val gso = remember {
@@ -59,7 +59,6 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             viewModel.loginConGoogle(account.idToken ?: "",
                 onSuccess = {
                     Toast.makeText(context, "Sesión iniciada con Google", Toast.LENGTH_SHORT).show()
-                    // navController.navigate(AppScreens.GrupoFamiliarScreen.route)
                 },
                 onFailure = {
                     Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -83,15 +82,26 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = Icons.Default.Person,
-            contentDescription = "Usuario",
-            tint = colorResource(R.color.primario),
-            modifier = Modifier
-                .size(100.dp)
-                .padding(bottom = 32.dp)
-        )
+        // Encabezado visual
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Usuario",
+                tint = colorResource(R.color.primario),
+                modifier = Modifier.size(80.dp)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Inicia sesión",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.texto_principal)
+            )
+        }
 
+        Spacer(modifier = Modifier.height(32.dp))
+
+        // Email
         OutlinedTextField(
             value = email,
             onValueChange = {
@@ -111,6 +121,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             )
         )
 
+        // Contraseña
         OutlinedTextField(
             value = password,
             onValueChange = {
@@ -123,7 +134,6 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             trailingIcon = {
                 val icon = if (passwordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
                 val description = if (passwordVisible) "Ocultar contraseña" else "Mostrar contraseña"
-
                 IconButton(onClick = { passwordVisible = !passwordVisible }) {
                     Icon(imageVector = icon, contentDescription = description)
                 }
@@ -139,6 +149,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             )
         )
 
+        // Botón iniciar sesión
         Button(
             onClick = {
                 val emailOk = email.isNotBlank()
@@ -155,8 +166,6 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
                                 popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
                                 launchSingleTop = true
                             }
-
-                            //navController.navigate(AppScreens.MiCuentaScreen.route)
                         },
                         onFailure = {
                             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -168,17 +177,18 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(52.dp),
+                .height(56.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorResource(R.color.primario),
                 contentColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
-            Text("Iniciar sesión", fontSize = 16.sp)
+            Text("Iniciar sesión", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
+        // Recuperar contraseña
         TextButton(onClick = {
             if (email.isBlank()) {
                 Toast.makeText(context, "Introduce tu email para recuperar la contraseña", Toast.LENGTH_SHORT).show()
@@ -191,12 +201,13 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
             Text(
                 text = "¿Has olvidado tu contraseña?",
                 color = colorResource(R.color.primario),
-                fontSize = 14.sp
+                fontSize = 15.sp
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
+        // Google Sign-In
         Button(
             onClick = {
                 val signInIntent = googleSignInClient.signInIntent
@@ -217,7 +228,7 @@ fun LoginUsuarioContent(navController: NavHostController, viewModel: MainViewMod
                 modifier = Modifier.size(35.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Iniciar sesión con Google")
+            Text("Iniciar sesión con Google", fontSize = 16.sp)
         }
     }
 }

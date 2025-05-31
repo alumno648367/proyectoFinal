@@ -1,12 +1,12 @@
 package net.azarquiel.cuidaplusjpc.model
 
 data class Medicamento(
-    var medicamentoId: String = "",                  // ID único del medicamento asignado
-    var enfermedadPacienteId: String = "",           // ID de la enfermedad del paciente a la que pertenece
-    var nombre: String = "",                         // Nombre del medicamento
+    var medicamentoId: String = "",                  // ID único
+    var enfermedadPacienteId: String = "",
+    var nombre: String = "",
     var dosis: String = "",                          // Ej: "500 mg"
     var frecuencia: String = "",                     // Ej: "Cada 8 horas"
     var viaAdministracion: String = "",              // Ej: "Oral", "Intravenosa"
-    var horario: List<String> = emptyList(),         // Líneas futuras
-    var observaciones: String = ""                   // Notas adicionales
+    var horario: List<String> = emptyList(),         // Ej: ["08:00", "16:00", "00:00"]
+    var observaciones: String = ""
 )

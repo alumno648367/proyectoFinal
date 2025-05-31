@@ -1,5 +1,8 @@
 package net.azarquiel.cuidaplusjpc.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,49 +27,55 @@ import net.azarquiel.cuidaplusjpc.viewmodel.MainViewModel
 fun HomeScreen(navController: NavHostController, viewModel: MainViewModel) {
     Scaffold(
         containerColor = colorResource(R.color.fondo_claro),
-        content = { padding ->
-            CustomHomeContent(padding, navController)
-        }
-    )
+    ) { padding ->
+        HomeScreenContent(padding, navController)
+    }
 }
+
 @Composable
-fun CustomHomeContent(padding: PaddingValues, navController: NavHostController) {
+fun HomeScreenContent(padding: PaddingValues, navController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding)
-            .padding(horizontal = 32.dp),
-        verticalArrangement = Arrangement.SpaceEvenly,
+            .padding(horizontal = 32.dp, vertical = 48.dp),
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Logo animado
+        AnimatedVisibility(
+            visible = true,
+            enter = fadeIn() + scaleIn()
         ) {
             Image(
                 painter = painterResource(id = R.drawable.logosinletras),
                 contentDescription = "Logo Cuida+",
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(160.dp)
                     .clip(CircleShape)
-            )
-            Spacer(modifier = Modifier.width(12.dp))
-            Text(
-                text = "Cuida+",
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorResource(R.color.texto_principal)
             )
         }
 
-        Text(
-            text = "Cuidamos a los que más importan",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = colorResource(R.color.texto_principal),
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
+        // Nombre + lema
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = "Cuida+",
+                fontSize = 36.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.texto_principal)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Cuidamos a los que más importan",
+                fontSize = 18.sp,
+                color = colorResource(R.color.texto_principal),
+                textAlign = TextAlign.Center
+            )
+        }
 
+        // Botón principal
         Button(
             onClick = { navController.navigate(AppScreens.RegisterUsuarioScreen.route) },
             modifier = Modifier
@@ -76,18 +85,26 @@ fun CustomHomeContent(padding: PaddingValues, navController: NavHostController) 
                 containerColor = colorResource(R.color.primario),
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ),
-            shape = MaterialTheme.shapes.medium
+            shape = MaterialTheme.shapes.large
         ) {
-            Text("Empezar", fontSize = 18.sp)
+            Text(
+                text = "Empezar",
+                fontSize = 20.sp,  // Más grande
+                fontWeight = FontWeight.SemiBold
+            )
         }
 
+        // Enlace a login con más visibilidad
         Text(
             text = "¿Ya tienes una cuenta? Inicia sesión",
             modifier = Modifier
+                .padding(top = 16.dp)
                 .clickable { navController.navigate(AppScreens.LoginUsuarioScreen.route) },
             color = colorResource(R.color.texto_principal),
-            fontSize = 14.sp,
+            fontSize = 16.sp,  // Más grande
+            fontWeight = FontWeight.SemiBold,
             textAlign = TextAlign.Center
         )
+
     }
 }
