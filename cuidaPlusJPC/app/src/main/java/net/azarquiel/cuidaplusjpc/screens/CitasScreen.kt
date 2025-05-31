@@ -1,10 +1,8 @@
 package net.azarquiel.cuidaplusjpc.screens
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,14 +10,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Description
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.Notes
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,46 +43,57 @@ import java.text.SimpleDateFormat
 @Composable
 fun CitasScreen(
     navController: NavHostController,
-    viewModel: CitaViewModel,
-    mainViewModel: MainViewModel,
+    citaViewModel: CitaViewModel,
+    viewModel: MainViewModel,
     grupoId: String,
-    padding: PaddingValues
+    padding: PaddingValues = PaddingValues()
 ) {
-    val grupo = mainViewModel.grupoVM.grupo.observeAsState().value
+    val grupo = viewModel.grupoVM.grupo.observeAsState().value
 
-    val citas: List<CitaMedica> = viewModel.citas
+    val citas: List<CitaMedica> = citaViewModel.citas
 
     var filtro by remember { mutableStateOf("") }
     val citasFiltradas = citas.filter {
-        it.motivo.contains(filtro, ignoreCase = true)
-                || it.medico.contains(filtro, ignoreCase = true)
+        val texto = filtro.trim().lowercase()
+            it.motivo.lowercase().contains(texto) ||
+            it.medico.lowercase().contains(texto) ||
+            it.ubicacion.lowercase().contains(texto) ||
+            it.especialidad.lowercase().contains(texto) ||
+            it.usuarioAcompananteNombre.lowercase().contains(texto)
     }
 
+
     LaunchedEffect(grupoId) {
-        viewModel.cargarCitasPorGrupo(grupoId)
+        citaViewModel.cargarCitasPorGrupo(grupoId)
     }
 
     Scaffold(
         topBar = { CitasTopBar(grupo?.nombre ?: "") },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigate("addCita/$grupoId") },
-                modifier = Modifier.padding(bottom = 56.dp),
-                containerColor = colorResource(R.color.secundario),
-                contentColor = Color.White
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 16.dp, bottom = 80.dp), // Ajustado para dejar hueco al bottom nav
+                contentAlignment = Alignment.BottomEnd
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir cita")
+                FloatingActionButton(
+                    onClick = { navController.navigate("addCita/$grupoId") },
+                    containerColor = colorResource(R.color.secundario),
+                    contentColor = Color.White
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Añadir cita")
+                }
             }
         },
         containerColor = colorResource(R.color.fondo_claro)
     ) { innerPadding ->
         val combinedPadding = PaddingValues(
             top = padding.calculateTopPadding() + innerPadding.calculateTopPadding(),
-            bottom = padding.calculateBottomPadding() + innerPadding.calculateBottomPadding(),
+            bottom = padding.calculateBottomPadding(),
             start = 24.dp,
             end = 24.dp
         )
-        CitasContent(citasFiltradas, filtro, onFiltroChange = { filtro = it }, padding = combinedPadding)
+        CitasContent(citasFiltradas, filtro, onFiltroChange = { filtro = it }, padding = combinedPadding, viewModel)
     }
 }
 
@@ -83,7 +103,7 @@ fun CitasTopBar(nombreGrupo: String) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 24.dp, bottom = 16.dp),
+            .padding(top = 24.dp, bottom = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Icon(
@@ -109,7 +129,8 @@ fun CitasContent(
     citas: List<CitaMedica>,
     filtro: String,
     onFiltroChange: (String) -> Unit,
-    padding: PaddingValues
+    padding: PaddingValues,
+    viewModel: MainViewModel
 ) {
     LazyColumn(
         modifier = Modifier
@@ -139,7 +160,7 @@ fun CitasContent(
         }
 
         items(citas) { cita ->
-            CitaCard(cita)
+            CitaCard(cita,viewModel)
         }
 
         item {
@@ -150,41 +171,121 @@ fun CitasContent(
 
 @SuppressLint("SimpleDateFormat")
 @Composable
-fun CitaCard(cita: CitaMedica) {
+fun CitaCard(cita: CitaMedica, viewModel: MainViewModel) {
+    val paciente = viewModel.pacienteVM.pacientesDelGrupo.value?.find { it.pacienteId == cita.pacienteId }
+    val context = LocalContext.current
     val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm")
     val fechaTexto = formatter.format(cita.fechaHora)
 
-    var pressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(
-        targetValue = if (pressed) 0.96f else 1f,
-        animationSpec = tween(durationMillis = 200), label = "scaleAnimCita"
-    )
+    val alpha = if (cita.realizada) 0.4f else 1f
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .scale(scale)
-            .clickable(
-                indication = null,
-                interactionSource = remember { MutableInteractionSource() }
-            ) {
-                pressed = true
-                pressed = false
-            },
+            .alpha(alpha),
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp),
+        elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = colorResource(R.color.color_tarjeta))
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Text("Fecha: $fechaTexto", fontWeight = FontWeight.Bold, color = colorResource(R.color.texto_principal))
-            Text("Motivo: ${cita.motivo}", color = Color.DarkGray)
-            Text("Médico: ${cita.medico}", color = Color.DarkGray)
-            Text("Especialidad: ${cita.especialidad}", color = Color.DarkGray)
-            Text("Ubicación: ${cita.ubicacion}", color = Color.DarkGray)
-            Text("Realizada: ${if (cita.realizada) "Sí" else "No"}", color = Color.DarkGray)
+        Column(modifier = Modifier.padding(16.dp)) {
+
+            Text(
+                text = paciente?.nombreCompleto?.uppercase() ?: "PACIENTE DESCONOCIDO",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.texto_principal),
+                modifier = Modifier
+                    .align(alignment = Alignment.CenterHorizontally)
+                    .padding(bottom = 8.dp),
+                letterSpacing = 1.5.sp,
+            )
+
+            Text(
+                text = fechaTexto,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = colorResource(R.color.primario)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            InfoRow(Icons.Default.Person, "Acompañante", cita.usuarioAcompananteNombre)
+            InfoRow(Icons.Default.Description, "Motivo", cita.motivo)
+            InfoRow(Icons.Default.MedicalServices, "Médico", cita.medico)
+            InfoRow(Icons.Default.LocalHospital, "Especialidad", cita.especialidad)
+            InfoRow(Icons.Default.Place, "Ubicación", cita.ubicacion)
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Realizada",
+                        fontWeight = FontWeight.Bold,
+                        color = colorResource(R.color.texto_principal)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Switch(
+                        checked = cita.realizada,
+                        onCheckedChange = { nuevoEstado ->
+                            viewModel.citaVM.actualizarEstadoCita(
+                                citaId = cita.citaMedicaId,
+                                realizada = nuevoEstado,
+                                onSuccess = {
+                                    Toast.makeText(context, "Estado actualizado", Toast.LENGTH_SHORT).show()
+                                },
+                                onFailure = {
+                                    Toast.makeText(context, "Error al actualizar", Toast.LENGTH_SHORT).show()
+                                }
+                            )
+                        },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = colorResource(R.color.primario),
+                            checkedTrackColor = colorResource(R.color.primario).copy(alpha = 0.5f),
+                            uncheckedThumbColor = colorResource(R.color.fondo_claro),
+                            uncheckedTrackColor = colorResource(R.color.secundario).copy(alpha = 0.5f)
+                        )
+                    )
+                }
+
+                IconButton(onClick = {
+                    viewModel.citaVM.eliminarCita(
+                        cita.citaMedicaId,
+                        onSuccess = {
+                            Toast.makeText(context, "Cita eliminada", Toast.LENGTH_SHORT).show()
+                        },
+                        onFailure = {
+                            Toast.makeText(context, "Error al eliminar", Toast.LENGTH_SHORT).show()
+                        }
+                    )
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Eliminar cita",
+                        tint = colorResource(R.color.primario)
+                    )
+                }
+            }
+
         }
     }
 }
+
+@Composable
+fun InfoRow(icon: ImageVector, label: String, valor: String) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.padding(vertical = 2.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = colorResource(R.color.primario))
+        Text("$label:", fontWeight = FontWeight.Bold)
+        Text(valor, color = Color.DarkGray)
+    }
+}
+

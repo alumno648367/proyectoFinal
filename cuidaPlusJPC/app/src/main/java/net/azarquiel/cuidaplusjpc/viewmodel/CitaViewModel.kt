@@ -46,12 +46,16 @@ class CitaViewModel : ViewModel() {
         repo.eliminarCita(citaId, onSuccess, onFailure)
     }
 
-    fun actualizarRealizada(
+    fun actualizarEstadoCita(
         citaId: String,
         realizada: Boolean,
         onSuccess: () -> Unit,
         onFailure: (Exception) -> Unit
     ) {
         repo.actualizarEstadoCita(citaId, realizada, onSuccess, onFailure)
+    }
+    fun clearCitas() {
+        citas.clear()
+        citaActual.value = null
     }
 }

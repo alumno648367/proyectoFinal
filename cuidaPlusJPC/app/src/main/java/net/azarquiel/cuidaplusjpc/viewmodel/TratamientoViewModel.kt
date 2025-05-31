@@ -30,4 +30,7 @@ class TratamientoViewModel : ViewModel() {
     fun eliminarTratamiento(tratamientoId: String) {
         repo.eliminarTratamiento(tratamientoId, {}, {})
     }
+    fun clearTratamientos() {
+        tratamientosPorEnfermedad.clear()
+    }
 }

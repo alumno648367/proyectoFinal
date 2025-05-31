@@ -89,6 +89,9 @@ class PacienteViewModel : ViewModel() {
             pacientesDelGrupo.value = lista
         }
     }
+    fun clearPacientes() {
+        pacientesDelGrupo.value = emptyList()
+    }
 
 
 }

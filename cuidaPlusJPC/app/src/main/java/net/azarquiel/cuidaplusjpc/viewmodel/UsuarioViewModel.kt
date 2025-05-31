@@ -64,6 +64,14 @@ class UsuarioViewModel : ViewModel() {
             usuariosGrupo.value = lista
         }
     }
+    fun clearUsuario() {
+        _usuario.value = null
+        usuariosGrupo.value = emptyList()
+    }
+    fun clearUsuariosGrupo() {
+        usuariosGrupo.value = emptyList()
+    }
+
 
 
 }

@@ -34,7 +34,7 @@ fun AddCitaScreen(
     navController: NavHostController,
     viewModel: MainViewModel,
     grupoId: String,
-    padding: PaddingValues
+    padding: PaddingValues = PaddingValues()
 ) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
 
@@ -365,12 +365,6 @@ fun AddCitaScreenContent(
         } else {
             Text("No hay usuarios disponibles", color = Color.Gray)
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(checked = realizada, onCheckedChange = { realizada = it })
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("¿Realizada?")
-        }
-
         val formularioValido = pacienteSeleccionado != null &&
                 usuarioSeleccionado != null &&
                 fechaDate != null &&

@@ -46,6 +46,11 @@ class EnfermedadPacienteViewModel : ViewModel() {
             }
         }
     }
+    fun clearEnfermedades() {
+        relaciones.value = emptyList()
+        enfermedadesPorPaciente.value = emptyMap()
+    }
+
 
 
 

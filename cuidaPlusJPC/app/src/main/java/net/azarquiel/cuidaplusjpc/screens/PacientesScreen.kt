@@ -37,7 +37,7 @@ import java.util.*
 fun PacientesScreen(
     navController: NavHostController,
     viewModel: MainViewModel,
-    padding: PaddingValues
+    padding: PaddingValues = PaddingValues()
 ) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
 

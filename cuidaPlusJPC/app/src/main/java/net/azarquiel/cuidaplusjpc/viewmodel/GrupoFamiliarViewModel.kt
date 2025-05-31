@@ -85,6 +85,9 @@ class GrupoFamiliarViewModel : ViewModel() {
     fun obtenerGrupoPorNombre(nombre: String, onResult: (GrupoFamiliar?) -> Unit) {
         repo.obtenerGrupoPorNombre(nombre, onResult)
     }
+    fun clearGrupo() {
+        _grupo.value = null
+    }
 
 
 

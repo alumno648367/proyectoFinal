@@ -30,7 +30,7 @@ import java.util.*
 fun AddPacienteScreen(
     navController: NavHostController,
     viewModel: MainViewModel,
-    padding: PaddingValues
+    padding: PaddingValues = PaddingValues()
 ) {
     Scaffold(
         topBar = {

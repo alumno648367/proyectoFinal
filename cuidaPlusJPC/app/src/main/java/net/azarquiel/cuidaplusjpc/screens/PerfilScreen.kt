@@ -112,67 +112,20 @@ fun PerfilScreenContent(
             }
 
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(4.dp)
+                OutlinedButton(
+                    onClick = { viewModel.cerrarSesion(navController) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = colorResource(R.color.primario),
+                        contentColor = colorResource(R.color.texto_principal)
+                    )
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Warning, contentDescription = null, tint = Color.Red)
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                "Eliminar cuenta",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.Red
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            "Esta acción eliminará tu cuenta de forma permanente. ¿Estás seguro de que deseas continuar?",
-                            fontSize = 14.sp
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Button(
-                            onClick = {
-                                Toast.makeText(
-                                    context,
-                                    "Eliminar cuenta aún no implementado",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            },
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red,
-                                contentColor = Color.White
-                            ),
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Text("Eliminar cuenta")
-                        }
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        OutlinedButton(
-                            onClick = {
-                                FirebaseAuth.getInstance().signOut()
-                                navController.navigate(AppScreens.HomeScreen.route) {
-                                    popUpTo(0) // limpia todo el backstack
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 16.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = colorResource(R.color.primario),
-                                contentColor = colorResource(R.color.texto_principal)
-                            )
-                        ) {
-                            Text("Cerrar sesión", fontSize = 16.sp)
-                        }
-                    }
+                    Text("Cerrar sesión", fontSize = 16.sp)
                 }
+
+
             }
 
             item {

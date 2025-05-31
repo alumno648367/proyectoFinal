@@ -4,10 +4,12 @@ import Usuario
 import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavHostController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import net.azarquiel.cuidaplusjpc.model.GrupoFamiliar
+import net.azarquiel.cuidaplusjpc.navigation.AppScreens
 import net.azarquiel.cuidaplusjpc.utils.cargarEnfermedadesDesdeAssets
 import net.azarquiel.cuidaplusjpc.utils.cargarMedicamentosMaestroDesdeAssets
 import net.azarquiel.cuidaplusjpc.utils.cargarTratamientosMaestroDesdeAssets
@@ -200,6 +202,24 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
          }
       }
    }
+   fun clearAllData() {
+      usuarioVM.clearUsuario()
+      grupoVM.clearGrupo()
+      pacienteVM.clearPacientes()
+      citaVM.clearCitas()
+      enfermedadPacienteVM.clearEnfermedades()
+      tratamientoVM.clearTratamientos()
+      medicamentoVM.clearMedicamentos()
+   }
+   fun cerrarSesion(navController: NavHostController) {
+      clearAllData()
+      FirebaseAuth.getInstance().signOut()
+      navController.navigate(AppScreens.HomeScreen.route) {
+         popUpTo(0) { inclusive = true }
+         launchSingleTop = true
+      }
+   }
+
    fun subirEnfermedadesAFirebase(context: Context) {
       val enfermedades = cargarEnfermedadesDesdeAssets(context)
       val db = FirebaseFirestore.getInstance()

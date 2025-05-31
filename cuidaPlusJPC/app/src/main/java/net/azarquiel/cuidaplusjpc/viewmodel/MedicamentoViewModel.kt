@@ -51,5 +51,8 @@ class MedicamentoViewModel : ViewModel() {
     fun eliminarMedicamento(medicamentoId: String) {
         repo.eliminarMedicamento(medicamentoId, {}, {})
     }
+    fun clearMedicamentos() {
+        medicamentosPorEnfermedad.clear()
+    }
 }
 

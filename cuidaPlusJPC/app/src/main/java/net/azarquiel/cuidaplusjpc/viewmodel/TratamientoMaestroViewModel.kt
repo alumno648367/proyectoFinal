@@ -18,4 +18,7 @@ class TratamientoMaestroViewModel : ViewModel() {
             _tratamientos.value = lista
         }
     }
+    fun clearTratamientos() {
+        _tratamientos.value = emptyList()
+    }
 }

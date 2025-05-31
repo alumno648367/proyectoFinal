@@ -4,7 +4,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.compose.currentBackStackEntryAsState
 import net.azarquiel.cuidaplusjpc.R
+
 @Composable
 fun BottomNavigationBar(
     navController: NavController,
@@ -18,28 +21,27 @@ fun BottomNavigationBar(
         BottomNavItem.Citas
     )
 
+    val navBackStackEntry = navController.currentBackStackEntryAsState().value
+    val currentRoute = navBackStackEntry?.destination?.route
+
     NavigationBar(containerColor = colorResource(R.color.primario)) {
         items.forEach { item ->
-            // 3. Si es el item "Citas" y tenemos grupoId, navegamos a citas/<grupoId>
-            val targetRoute = if (item == BottomNavItem.Citas && grupoId != null) {
-                "citas/$grupoId"
-            } else {
-                item.route
-            }
+            val isCitas = item == BottomNavItem.Citas
+            val actualRoute = if (isCitas && grupoId != null) "citas/$grupoId" else item.route
 
             NavigationBarItem(
                 icon = { Icon(item.icon, contentDescription = item.title) },
-                selected = navController.currentDestination?.route == targetRoute,
+                selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == item.route } == true,
                 onClick = {
-                    navController.navigate(targetRoute) {
-                        popUpTo(targetRoute) { inclusive = true }
+                    navController.navigate(actualRoute) {
+                        popUpTo(item.route) { inclusive = true }
                         launchSingleTop = true
                         restoreState = true
                     }
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = MaterialTheme.colorScheme.onPrimary,
-                    indicatorColor   = colorResource(R.color.secundario)
+                    indicatorColor = colorResource(R.color.secundario)
                 )
             )
         }

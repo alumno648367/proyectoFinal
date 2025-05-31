@@ -277,7 +277,10 @@ fun RegisterCompletoContent(
                             Toast.makeText(context, "Usuario y grupo creados", Toast.LENGTH_SHORT)
                                 .show()
                             viewModel.usuarioVM.empezarEscucha(uid)
-                             navController.navigate(AppScreens.MainScreen.route)
+                            navController.navigate("inicio") {
+                                popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         },
                         onFailure = {
                             isGuardando = false
@@ -290,7 +293,10 @@ fun RegisterCompletoContent(
                             isGuardando = false
                             Toast.makeText(context, "Usuario unido al grupo", Toast.LENGTH_SHORT).show()
                             viewModel.usuarioVM.empezarEscucha(uid)
-                            navController.navigate(AppScreens.MainScreen.route)
+                            navController.navigate("inicio") {
+                                popUpTo(AppScreens.LoginUsuarioScreen.route) { inclusive = true }
+                                launchSingleTop = true
+                            }
                         },
                         onFailure = {
                             isGuardando = false

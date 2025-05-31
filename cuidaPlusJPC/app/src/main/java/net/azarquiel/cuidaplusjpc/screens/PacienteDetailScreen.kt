@@ -212,24 +212,7 @@ fun PacienteDetailScreenContent(
         }
 
         // Secciones futuras que aún no están implementadas
-        val secciones = listOf("Citas médicas", "Historial clínico")
-        items(secciones.size) { i ->
-            var expanded by remember { mutableStateOf(false) }
-            Card(
-                onClick = { expanded = !expanded },
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(4.dp)
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(secciones[i], style = MaterialTheme.typography.titleMedium)
-                    if (expanded) {
-                        Spacer(Modifier.height(8.dp))
-                        Text("En desarrollo", fontStyle = MaterialTheme.typography.bodySmall.fontStyle)
-                    }
-                }
-            }
-        }
+
 
 
         item { Spacer(modifier = Modifier.height(80.dp)) }
