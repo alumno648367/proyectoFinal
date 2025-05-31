@@ -2,6 +2,7 @@ package net.azarquiel.cuidaplusjpc.screens
 
 import Usuario
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
@@ -36,10 +37,10 @@ import java.util.*
 fun GrupoScreen(navController: NavHostController, viewModel: MainViewModel) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
 
-    LaunchedEffect(grupo?.grupoFamiliarId) {
-        grupo?.let {
-            viewModel.usuarioVM.obtenerUsuariosPorIds(it.miembros)
-            viewModel.pacienteVM.cargarPacientesDelGrupo(it.grupoFamiliarId)
+    LaunchedEffect(Unit) {
+        if (grupo != null) {
+            viewModel.usuarioVM.obtenerUsuariosPorIds(grupo.miembros)
+            viewModel.pacienteVM.cargarPacientesDelGrupo(grupo.grupoFamiliarId)
         }
     }
 
@@ -85,6 +86,7 @@ fun GrupoContent(
     viewModel: MainViewModel,
     navController: NavHostController
 ) {
+
     val usuarioActual = viewModel.usuarioVM.usuario.observeAsState().value
     val usuarios by viewModel.usuarioVM.usuariosGrupo.observeAsState(emptyList())
     val pacientes by viewModel.pacienteVM.pacientesDelGrupo.observeAsState(emptyList())
@@ -142,6 +144,8 @@ fun CardUsuario(
     navController: NavHostController,
     contexto: Context
 ) {
+    Log.d("GRUPO", "-> mostrando usuario: ${usuario.nombre}")
+
     val esActual = usuario.usuarioId == usuarioActual?.usuarioId
     val bgColor by animateColorAsState(
         targetValue = if (esActual) colorResource(R.color.usuario_actual_tarjeta) else colorResource(R.color.color_tarjeta),

@@ -180,12 +180,22 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
       onSuccess: () -> Unit,
       onFailure: (String) -> Unit
    ) {
-      grupoVM.añadirMiembro(grupoId, uid)
-      usuarioVM.guardarUsuario(usuario,
-         onSuccess = onSuccess,
-         onFailure = { onFailure("Error al guardar usuario") }
+      grupoVM.añadirMiembro(
+         grupoId,
+         uid,
+         onSuccess = {
+            usuarioVM.guardarUsuario(
+               usuario,
+               onSuccess = {
+                  onSuccess()  // solo se lanza cuando ambas escrituras han terminado
+               },
+               onFailure = { onFailure("Error al guardar usuario") }
+            )
+         },
+         onFailure = { onFailure("Error al añadir al grupo") }
       )
    }
+
    fun unirseAGrupoPorNombre(
       nombreGrupo: String,
       uid: String,
@@ -202,6 +212,7 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
          }
       }
    }
+
    fun clearAllData() {
       usuarioVM.clearUsuario()
       grupoVM.clearGrupo()
