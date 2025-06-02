@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "112327642719-arroaut03c1vhcmvaibdr3r1oq52n9qa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "net.azarquiel.cuidaplusjpc",
+            "certificate_hash": "a37e963e211f419fcdfdad5fede04c59d46cbfae"
+          }
+        },
+        {
           "client_id": "112327642719-fvn1ecpe5qgn1icn3qs3gri1tf1dc83e.apps.googleusercontent.com",
           "client_type": 3
         }

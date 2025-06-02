@@ -75,9 +75,22 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
    ) {
       val credential = GoogleAuthProvider.getCredential(idToken, null)
       auth.signInWithCredential(credential)
-         .addOnSuccessListener { onSuccess() }
-         .addOnFailureListener { onFailure(it.message ?: "Error al iniciar con Google") }
+         .addOnSuccessListener {
+            val uid = it.user?.uid ?: ""
+            usuarioVM.empezarEscucha(uid)
+            usuarioVM.usuario.observeForever { usuario ->
+               val grupoId = usuario?.grupos?.firstOrNull()
+               if (!grupoId.isNullOrEmpty()) {
+                  grupoVM.cargarGrupo(grupoId)
+               }
+            }
+            onSuccess()
+         }
+         .addOnFailureListener {
+            onFailure(it.message ?: "Error al iniciar con Google")
+         }
    }
+
 
    /**
     * Envía un correo para recuperar la contraseña
