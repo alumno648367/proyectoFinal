@@ -15,3 +15,8 @@ data class CitaMedica(
     var observaciones: String = "",            // Observaciones adicionales
     var realizada: Boolean = false             // True si ya se realizó
 )
+
+
+
+
+

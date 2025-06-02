@@ -1,6 +1,7 @@
 package net.azarquiel.cuidaplusjpc.screens
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -19,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -152,7 +154,7 @@ fun PacientesLista(
         contentPadding = PaddingValues(top = 8.dp, bottom = bottomPadding + 80.dp)
     ) {
         items(pacientesFiltrados) { paciente ->
-            PacienteCard(paciente, navController)
+            PacienteCard(paciente, navController,viewModel)
         }
     }
 }
@@ -161,8 +163,10 @@ fun PacientesLista(
 @Composable
 fun PacienteCard(
     paciente: Paciente,
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: MainViewModel
 ) {
+    val context = LocalContext.current
     // Cálculo de edad basado en el año actual
     val edad = Calendar.getInstance().get(Calendar.YEAR) -
             Calendar.getInstance().apply { time = paciente.fechaNacimiento }.get(Calendar.YEAR)
@@ -191,36 +195,52 @@ fun PacienteCard(
         elevation = CardDefaults.cardElevation(8.dp),
         colors = CardDefaults.cardColors(containerColor = colorResource(R.color.color_tarjeta))
     ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.weight(1f)
             ) {
-                Icon(Icons.Default.Person, contentDescription = null, tint = colorResource(R.color.primario), modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(12.dp))
-                Text(paciente.nombreCompleto, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = colorResource(R.color.texto_principal))
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Person, contentDescription = null, tint = colorResource(R.color.primario), modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(paciente.nombreCompleto, fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Cake, contentDescription = null, tint = colorResource(R.color.secundario), modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("$edad años", fontSize = 16.sp)
+                }
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Place, contentDescription = null, tint = colorResource(R.color.terciario), modifier = Modifier.size(20.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Dirección: ${paciente.direccion}", fontSize = 16.sp)
+                }
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Cake, contentDescription = null, tint = colorResource(R.color.secundario), modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(12.dp))
-                Text("$edad años", fontSize = 16.sp, color = Color.DarkGray)
-            }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Icon(Icons.Default.Place, contentDescription = null, tint = colorResource(R.color.terciario), modifier = Modifier.size(20.dp))
-                Spacer(modifier = Modifier.width(12.dp))
-                Text("Dirección: ${paciente.direccion}", fontSize = 16.sp, color = Color.DarkGray)
-            }
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = "Eliminar paciente",
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(28.dp)
+                    .clickable {
+                        viewModel.pacienteVM.eliminarPaciente(
+                            pacienteId = paciente.pacienteId,
+                            onSuccess = {
+                                Toast.makeText(context, "Paciente eliminado", Toast.LENGTH_SHORT).show()
+                            },
+                            onFailure = {
+                                Toast.makeText(context, "Error al eliminar", Toast.LENGTH_SHORT).show()
+                            }
+                        )
+                    }
+            )
         }
     }
 }

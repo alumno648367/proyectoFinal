@@ -49,6 +49,11 @@ fun CitasScreen(
     padding: PaddingValues = PaddingValues()
 ) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
+    LaunchedEffect(grupo?.grupoFamiliarId) {
+        grupo?.let {
+            citaViewModel.cargarCitasPorGrupo(it.grupoFamiliarId)
+        }
+    }
 
     val citas: List<CitaMedica> = citaViewModel.citas
 
@@ -63,9 +68,8 @@ fun CitasScreen(
     }
 
 
-    LaunchedEffect(grupoId) {
-        citaViewModel.cargarCitasPorGrupo(grupoId)
-    }
+
+
 
     Scaffold(
         topBar = { CitasTopBar(grupo?.nombre ?: "") },

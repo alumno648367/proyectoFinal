@@ -77,7 +77,6 @@ fun AddCitaScreen(
     ) { innerPadding ->
         val combinedPadding = PaddingValues(
             top = padding.calculateTopPadding() + innerPadding.calculateTopPadding(),
-            bottom = padding.calculateBottomPadding() + innerPadding.calculateBottomPadding(),
             start = 24.dp,
             end = 24.dp
         )
@@ -427,7 +426,7 @@ fun AddCitaScreenContent(
 
                 val cita = CitaMedica(
                     citaMedicaId = UUID.randomUUID().toString(),
-                    grupoFamiliarId = grupoId,
+                    grupoFamiliarId = viewModel.grupoVM.grupo.value?.grupoFamiliarId ?: "",
                     pacienteId = pacienteSeleccionado!!.pacienteId,
                     usuarioAcompananteNombre = usuarioSeleccionado!!.nombre,
                     fechaHora = fechaHoraFinal,

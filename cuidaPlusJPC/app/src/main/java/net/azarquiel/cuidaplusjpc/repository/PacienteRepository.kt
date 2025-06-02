@@ -108,7 +108,33 @@ class PacienteRepository {
         onFailure: (Exception) -> Unit
     ) {
         ref.document(pacienteId).delete()
-            .addOnSuccessListener { onSuccess() }
+            .addOnSuccessListener {
+                // Eliminar también citas de ese paciente
+                eliminarCitasDelPaciente(pacienteId,
+                    onSuccess = { onSuccess() },
+                    onFailure = { onFailure(it) }
+                )
+            }
             .addOnFailureListener { onFailure(it) }
     }
+    /**
+     * Elimina las citas del paciente.
+     */
+    private fun eliminarCitasDelPaciente(
+        pacienteId: String,
+        onSuccess: () -> Unit,
+        onFailure: (Exception) -> Unit
+    ) {
+        FirebaseFirestore.getInstance().collection("citas")
+            .whereEqualTo("pacienteId", pacienteId)
+            .get()
+            .addOnSuccessListener { query ->
+                val batch = FirebaseFirestore.getInstance().batch()
+                query.documents.forEach { batch.delete(it.reference) }
+                batch.commit().addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener { onFailure(it) }
+            }
+            .addOnFailureListener { onFailure(it) }
+    }
+
 }

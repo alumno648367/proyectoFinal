@@ -37,6 +37,7 @@ fun MiCuentaScreen(navController: NavHostController, viewModel: MainViewModel) {
         // Pasamos el topPadding para respetar el espacio del sistema
         MiCuentaContent(
             viewModel = viewModel,
+            navController = navController,
             grupoNombre = grupo?.nombre,
             paddingTop = padding.calculateTopPadding()
         )
@@ -45,7 +46,7 @@ fun MiCuentaScreen(navController: NavHostController, viewModel: MainViewModel) {
 
 @SuppressLint("SimpleDateFormat")
 @Composable
-fun MiCuentaContent(viewModel: MainViewModel, grupoNombre: String?, paddingTop: Dp) {
+fun MiCuentaContent(viewModel: MainViewModel,navController: NavHostController,grupoNombre: String?, paddingTop: Dp) {
     val pacientes by viewModel.pacienteVM.pacientesDelGrupo.observeAsState(emptyList())
     val enfermedadesPorPaciente by viewModel.enfermedadPacienteVM.enfermedadesPorPaciente.observeAsState(emptyMap())
     val citas = viewModel.citaVM.citas
@@ -115,6 +116,9 @@ fun MiCuentaContent(viewModel: MainViewModel, grupoNombre: String?, paddingTop: 
         // Tarjetas por cada paciente
         items(pacientes) { p ->
             Card(
+                onClick = {
+                    navController.navigate("detailPaciente/${p.pacienteId}")
+                },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
                 elevation = CardDefaults.cardElevation(6.dp),

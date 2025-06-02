@@ -10,3 +10,8 @@ data class Medicamento(
     var horario: List<String> = emptyList(),         // Líneas futuras
     var observaciones: String = ""                   // Notas adicionales
 )
+
+
+
+
+
