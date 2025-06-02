@@ -153,6 +153,19 @@ fun PacientesLista(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(top = 8.dp, bottom = bottomPadding + 80.dp)
     ) {
+        if (pacientes.isEmpty()) {
+            item {
+                Text(
+                    text = "Aún no hay pacientes registrados.",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
         items(pacientesFiltrados) { paciente ->
             PacienteCard(paciente, navController,viewModel)
         }

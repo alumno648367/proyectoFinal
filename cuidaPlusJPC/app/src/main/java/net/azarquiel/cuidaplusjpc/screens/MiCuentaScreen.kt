@@ -112,7 +112,19 @@ fun MiCuentaContent(viewModel: MainViewModel,navController: NavHostController,gr
                 color = colorResource(R.color.texto_principal)
             )
         }
-
+        if (pacientes.isEmpty()) {
+            item {
+                Text(
+                    text = "Aún no hay pacientes registrados en este grupo.",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
         // Tarjetas por cada paciente
         items(pacientes) { p ->
             Card(

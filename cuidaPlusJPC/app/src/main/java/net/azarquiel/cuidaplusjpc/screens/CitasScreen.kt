@@ -160,7 +160,19 @@ fun CitasContent(
                 )
             )
         }
-
+        if (citas.isEmpty()) {
+            item {
+                Text(
+                    text = "Aún no hay citas registradas.",
+                    fontSize = 16.sp,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
         items(citas) { cita ->
             CitaCard(cita,viewModel)
         }
