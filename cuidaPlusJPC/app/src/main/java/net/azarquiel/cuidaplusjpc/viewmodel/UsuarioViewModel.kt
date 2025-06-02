@@ -71,6 +71,11 @@ class UsuarioViewModel : ViewModel() {
     fun clearUsuariosGrupo() {
         usuariosGrupo.value = emptyList()
     }
+    fun escucharUsuariosPorIds(ids: List<String>) {
+        repo.escucharUsuariosPorIds(ids) { lista ->
+            usuariosGrupo.value = lista
+        }
+    }
 
 
 

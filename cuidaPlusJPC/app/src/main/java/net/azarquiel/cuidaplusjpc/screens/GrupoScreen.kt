@@ -41,7 +41,7 @@ fun GrupoScreen(navController: NavHostController, viewModel: MainViewModel) {
     // Carga inicial de usuarios y pacientes
     LaunchedEffect(Unit) {
         grupo?.let {
-            viewModel.usuarioVM.obtenerUsuariosPorIds(it.miembros)
+            viewModel.usuarioVM.escucharUsuariosPorIds(it.miembros)
             viewModel.pacienteVM.cargarPacientesDelGrupo(it.grupoFamiliarId)
         }
     }

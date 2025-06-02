@@ -89,4 +89,28 @@ class UsuarioRepository {
                 onResult(emptyList())
             }
     }
+    fun escucharUsuariosPorIds(
+        ids: List<String>,
+        onResult: (List<Usuario>) -> Unit
+    ) {
+        if (ids.isEmpty()) {
+            onResult(emptyList())
+            return
+        }
+
+        val usuarios = mutableMapOf<String, Usuario>()
+
+        ids.forEach { id ->
+            ref.document(id).addSnapshotListener { snapshot, _ ->
+                if (snapshot != null && snapshot.exists()) {
+                    val usuario = snapshot.toObject(Usuario::class.java)
+                    if (usuario != null) {
+                        usuarios[id] = usuario
+                        onResult(usuarios.values.toList())
+                    }
+                }
+            }
+        }
+    }
+
 }

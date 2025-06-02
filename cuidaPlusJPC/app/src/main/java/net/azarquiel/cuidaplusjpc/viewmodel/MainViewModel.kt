@@ -120,10 +120,16 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
       onFailure: (String) -> Unit
    ) {
       val credential = GoogleAuthProvider.getCredential(idToken, null)
-      auth.signInWithCredential(credential)
-         .addOnSuccessListener { onSuccess() }
-         .addOnFailureListener { onFailure(it.message ?: "Error al registrar con Google") }
+      FirebaseAuth.getInstance().signInWithCredential(credential)
+         .addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+               onSuccess()
+            } else {
+               onFailure(task.exception?.message ?: "Error desconocido")
+            }
+         }
    }
+
 
    /**
     * Crea un nuevo grupo familiar y guarda el usuario

@@ -2,6 +2,7 @@ package net.azarquiel.cuidaplusjpc.screens
 
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -234,7 +235,7 @@ fun DropdownMedicacion(
 
     ExposedDropdownMenuBox(
         expanded = menuAbierto == label,
-        onExpandedChange = { expanded = !expanded }
+        onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
             value = selected,
@@ -254,7 +255,9 @@ fun DropdownMedicacion(
         )
         ExposedDropdownMenu(
             expanded = expanded,
-            onDismissRequest = { expanded = false }
+            onDismissRequest = { expanded = false },
+            modifier = Modifier
+                .background(Color.White)
         ) {
             options.forEach { opt ->
                 DropdownMenuItem(
@@ -262,7 +265,9 @@ fun DropdownMedicacion(
                     onClick = {
                         onSelect(opt)
                         expanded = false
-                    }
+                    },
+                    modifier = Modifier.background(colorResource(R.color.white))
+
                 )
             }
         }

@@ -1,5 +1,7 @@
 package net.azarquiel.cuidaplusjpc.screens
 
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -13,6 +15,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -63,12 +66,7 @@ fun GestionarEnfermedadesScreen(
         }
     }
 
-    // Si cambia la lista de enfermedades y no se ha seleccionado categoría, se autoasigna la primera
-    LaunchedEffect(enfermedades) {
-        if (enfermedades.isNotEmpty() && categoriaSeleccionada == "-- Selecciona categoría --") {
-            categoriaSeleccionada = enfermedades.first().categoria.trim()
-        }
-    }
+
 
     Scaffold(
         topBar = {
@@ -133,7 +131,9 @@ fun GestionarEnfermedadesScreen(
 
                 ExposedDropdownMenu(
                     expanded = expandedCategoria,
-                    onDismissRequest = { expandedCategoria = false }
+                    onDismissRequest = { expandedCategoria = false },
+                    modifier = Modifier
+                        .background(Color.White)
                 ) {
                     categorias.forEach { categoria ->
                         DropdownMenuItem(
@@ -142,7 +142,8 @@ fun GestionarEnfermedadesScreen(
                                 categoriaSeleccionada = categoria
                                 enfermedadSeleccionada = null
                                 expandedCategoria = false
-                            }
+                            },
+                            modifier = Modifier.background(colorResource(R.color.white))
                         )
                     }
                 }
@@ -152,7 +153,7 @@ fun GestionarEnfermedadesScreen(
             var expandedEnfermedad by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expandedEnfermedad,
-                onExpandedChange = { expandedEnfermedad = !expandedEnfermedad }
+                onExpandedChange = { expandedEnfermedad = !expandedEnfermedad },
             ) {
                 TextField(
                     value = enfermedadSeleccionada?.nombre ?: "",
@@ -183,7 +184,10 @@ fun GestionarEnfermedadesScreen(
                 )
                 ExposedDropdownMenu(
                     expanded = expandedEnfermedad,
-                    onDismissRequest = { expandedEnfermedad = false }
+                    onDismissRequest = { expandedEnfermedad = false },
+                    modifier = Modifier
+                        .background(Color.White)
+
                 ) {
                     enfermedadesFiltradas.forEach { enf ->
                         DropdownMenuItem(
@@ -191,7 +195,8 @@ fun GestionarEnfermedadesScreen(
                             onClick = {
                                 enfermedadSeleccionada = enf
                                 expandedEnfermedad = false
-                            }
+                            },
+                            modifier = Modifier.background(colorResource(R.color.white))
                         )
                     }
                 }
@@ -251,23 +256,37 @@ fun GestionarEnfermedadesScreen(
             )
 
             // Botón para guardar la nueva relación
+            val context = LocalContext.current
+
             Button(
                 onClick = {
-                    enfermedadSeleccionada?.let {
-                        val nuevaRelacion = EnfermedadPaciente(
-                            enfermedadPacienteId = UUID.randomUUID().toString(),
-                            pacienteId = pacienteId,
-                            enfermedadId = it.enfermedadId,
-                            nombre = it.nombre,
-                            categoria = it.categoria,
-                            fechaDiagnostico = Date().toString(),
-                            estado = estado,
-                            observaciones = observaciones
-                        )
-                        viewModel.enfermedadPacienteVM.guardarRelacion(nuevaRelacion)
-                        viewModel.pacienteVM.actualizarEnfermedadesDelPaciente(pacienteId)
+                    enfermedadSeleccionada?.let { enfermedad ->
+                        val yaExiste = relaciones.any { it.enfermedadId == enfermedad.enfermedadId }
+                        if (yaExiste) {
+                            Toast.makeText(context, "La enfermedad ya está asignada", Toast.LENGTH_SHORT).show()
+                        } else {
+                            val nuevaRelacion = EnfermedadPaciente(
+                                enfermedadPacienteId = UUID.randomUUID().toString(),
+                                pacienteId = pacienteId,
+                                enfermedadId = enfermedad.enfermedadId,
+                                nombre = enfermedad.nombre,
+                                categoria = enfermedad.categoria,
+                                fechaDiagnostico = Date().toString(),
+                                estado = estado,
+                                observaciones = observaciones
+                            )
+                            viewModel.enfermedadPacienteVM.guardarRelacion(nuevaRelacion)
+                            viewModel.pacienteVM.actualizarEnfermedadesDelPaciente(pacienteId)
+                            Toast.makeText(context, "Enfermedad guardada", Toast.LENGTH_SHORT).show()
+
+                            // Limpia los campos después de guardar
+                            enfermedadSeleccionada = null
+                            estado = "Activa"
+                            observaciones = ""
+                        }
                     }
                 },
+
                 enabled = enfermedadSeleccionada != null,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))

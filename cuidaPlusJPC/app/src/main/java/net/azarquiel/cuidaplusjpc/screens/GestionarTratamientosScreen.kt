@@ -2,6 +2,8 @@ package net.azarquiel.cuidaplusjpc.screens
 
 import android.app.DatePickerDialog
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -139,7 +141,9 @@ fun GestionarTratamientosScreen(
                 )
                 ExposedDropdownMenu(
                     expanded = expandedTratamiento,
-                    onDismissRequest = { expandedTratamiento = false }
+                    onDismissRequest = { expandedTratamiento = false },
+                    modifier = Modifier
+                        .background(Color.White)
                 ) {
                     tratamientosMaestro.forEach { t ->
                         DropdownMenuItem(
@@ -147,7 +151,9 @@ fun GestionarTratamientosScreen(
                             onClick = {
                                 tratamientoSeleccionado = t
                                 expandedTratamiento = false
-                            }
+                            },
+                            modifier = Modifier
+                                .background(Color.White)
                         )
                     }
                 }
