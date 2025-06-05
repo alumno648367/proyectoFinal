@@ -3,9 +3,9 @@ package net.azarquiel.cuidaplusjpc.screens
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.MedicalServices
@@ -33,7 +33,6 @@ fun GestionarEnfermedadesScreen(
     navController: NavHostController,
     viewModel: MainViewModel
 ) {
-    // Carga inicial de datos
     LaunchedEffect(true) {
         viewModel.enfermedadVM.cargarEnfermedades()
         viewModel.enfermedadPacienteVM.cargarPorPaciente(pacienteId)
@@ -47,64 +46,34 @@ fun GestionarEnfermedadesScreen(
     var estado by remember { mutableStateOf("Activa") }
     var observaciones by remember { mutableStateOf("") }
 
-    // Lista de categorías únicas, con opción inicial
     val categorias = remember(enfermedades) {
-        listOf("-- Selecciona categoría --") +
-                enfermedades.map { it.categoria.trim() }
-                    .distinct()
-                    .sorted()
+        listOf("-- Selecciona categoría --") + enfermedades.map { it.categoria.trim() }.distinct().sorted()
     }
 
-    // Filtrar enfermedades según la categoría seleccionada
     val enfermedadesFiltradas = remember(enfermedades, categoriaSeleccionada) {
-        if (categoriaSeleccionada == "-- Selecciona categoría --" || categoriaSeleccionada.isBlank()) {
-            emptyList()
-        } else {
-            enfermedades.filter {
-                it.categoria.trim().equals(categoriaSeleccionada.trim(), ignoreCase = true)
-            }
-        }
+        if (categoriaSeleccionada == "-- Selecciona categoría --") emptyList()
+        else enfermedades.filter { it.categoria.trim().equals(categoriaSeleccionada.trim(), true) }
     }
 
-
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 24.dp, bottom = 16.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp, bottom = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    imageVector = Icons.Default.MedicalServices,
-                    contentDescription = null,
-                    tint = colorResource(R.color.primario),
-                    modifier = Modifier
-                        .size(100.dp)
-                        .padding(top = 16.dp)
-                )
+                Icon(Icons.Default.MedicalServices, contentDescription = null, tint = colorResource(R.color.primario), modifier = Modifier.size(100.dp))
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Gestionar Enfermedades",
-                    color = colorResource(R.color.texto_principal),
-                    fontSize = 22.sp,
-                    style = MaterialTheme.typography.titleLarge
-                )
+                Text("Gestionar Enfermedades", color = colorResource(R.color.texto_principal), fontSize = 22.sp, style = MaterialTheme.typography.titleLarge)
             }
-        }
-        ,
+        },
         containerColor = colorResource(R.color.fondo_claro)
     ) { innerPadding ->
         Column(
-            modifier = Modifier
-                // Aplicar solo padding superior para no incluir el bottom del Scaffold
-                .padding(top = innerPadding.calculateTopPadding())
-                .padding(horizontal = 24.dp)
-                .verticalScroll(rememberScrollState()),
+            modifier = Modifier.padding(top = innerPadding.calculateTopPadding(), start = 24.dp, end = 24.dp).verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Dropdown de categoría
             var expandedCategoria by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expandedCategoria,
@@ -112,29 +81,14 @@ fun GestionarEnfermedadesScreen(
             ) {
                 TextField(
                     value = categoriaSeleccionada,
-                    onValueChange = { /*…*/ },
+                    onValueChange = {},
                     label = { Text("Categoría") },
                     readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCategoria)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.primario),
-                        unfocusedBorderColor = colorResource(R.color.texto_principal),
-                        cursorColor = colorResource(R.color.primario),
-                        focusedLabelColor = colorResource(R.color.primario)
-                    )
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedCategoria) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth(),
+                    colors = defaultEnfermedadTextFieldColors()
                 )
-
-                ExposedDropdownMenu(
-                    expanded = expandedCategoria,
-                    onDismissRequest = { expandedCategoria = false },
-                    modifier = Modifier
-                        .background(Color.White)
-                ) {
+                ExposedDropdownMenu(expandedCategoria, onDismissRequest = { expandedCategoria = false }, modifier = Modifier.background(Color.White)) {
                     categorias.forEach { categoria ->
                         DropdownMenuItem(
                             text = { Text(categoria) },
@@ -149,46 +103,21 @@ fun GestionarEnfermedadesScreen(
                 }
             }
 
-            // Dropdown de enfermedad
             var expandedEnfermedad by remember { mutableStateOf(false) }
             ExposedDropdownMenuBox(
                 expanded = expandedEnfermedad,
-                onExpandedChange = { expandedEnfermedad = !expandedEnfermedad },
+                onExpandedChange = { expandedEnfermedad = !expandedEnfermedad }
             ) {
                 TextField(
                     value = enfermedadSeleccionada?.nombre ?: "",
                     onValueChange = {},
                     label = { Text("Enfermedad") },
                     readOnly = true,
-                    trailingIcon = {
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedEnfermedad)
-                    },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.primario),
-                        unfocusedBorderColor = colorResource(R.color.secundario),
-                        cursorColor = colorResource(R.color.primario),
-                        focusedLabelColor = colorResource(R.color.primario),
-                        unfocusedLabelColor = colorResource(R.color.texto_principal),
-                        focusedLeadingIconColor = colorResource(R.color.primario),
-                        unfocusedLeadingIconColor = colorResource(R.color.secundario),
-                        focusedTrailingIconColor = colorResource(R.color.primario),
-                        unfocusedTrailingIconColor = colorResource(R.color.secundario),
-                        focusedPlaceholderColor = colorResource(R.color.texto_principal),
-                        unfocusedPlaceholderColor = colorResource(R.color.texto_principal),
-                        focusedTextColor = colorResource(R.color.texto_principal),
-                        unfocusedTextColor = colorResource(R.color.texto_principal)
-                    )
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expandedEnfermedad) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth(),
+                    colors = defaultEnfermedadTextFieldColors()
                 )
-                ExposedDropdownMenu(
-                    expanded = expandedEnfermedad,
-                    onDismissRequest = { expandedEnfermedad = false },
-                    modifier = Modifier
-                        .background(Color.White)
-
-                ) {
+                ExposedDropdownMenu(expandedEnfermedad, onDismissRequest = { expandedEnfermedad = false }, modifier = Modifier.background(Color.White)) {
                     enfermedadesFiltradas.forEach { enf ->
                         DropdownMenuItem(
                             text = { Text(enf.nombre) },
@@ -202,61 +131,25 @@ fun GestionarEnfermedadesScreen(
                 }
             }
 
-            // Mensaje si no hay enfermedades en la categoría elegida
-            if (enfermedadesFiltradas.isEmpty() &&
-                categoriaSeleccionada != "-- Selecciona categoría --"
-            ) {
+            if (enfermedadesFiltradas.isEmpty() && categoriaSeleccionada != "-- Selecciona categoría --") {
                 Text("No hay enfermedades en esta categoría", color = Color.Gray)
             }
 
-            // Campo para "Estado"
             OutlinedTextField(
                 value = estado,
                 onValueChange = { estado = it },
                 label = { Text("Estado") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.secundario),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLabelColor = colorResource(R.color.primario),
-                    unfocusedLabelColor = colorResource(R.color.texto_principal),
-                    focusedLeadingIconColor = colorResource(R.color.primario),
-                    unfocusedLeadingIconColor = colorResource(R.color.secundario),
-                    focusedTrailingIconColor = colorResource(R.color.primario),
-                    unfocusedTrailingIconColor = colorResource(R.color.secundario),
-                    focusedPlaceholderColor = colorResource(R.color.texto_principal),
-                    unfocusedPlaceholderColor = colorResource(R.color.texto_principal),
-                    focusedTextColor = colorResource(R.color.texto_principal),
-                    unfocusedTextColor = colorResource(R.color.texto_principal)
-                )
+                colors = defaultEnfermedadTextFieldColors()
             )
 
-            // Campo para "Observaciones"
             OutlinedTextField(
                 value = observaciones,
                 onValueChange = { observaciones = it },
                 label = { Text("Observaciones") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.secundario),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLabelColor = colorResource(R.color.primario),
-                    unfocusedLabelColor = colorResource(R.color.texto_principal),
-                    focusedLeadingIconColor = colorResource(R.color.primario),
-                    unfocusedLeadingIconColor = colorResource(R.color.secundario),
-                    focusedTrailingIconColor = colorResource(R.color.primario),
-                    unfocusedTrailingIconColor = colorResource(R.color.secundario),
-                    focusedPlaceholderColor = colorResource(R.color.texto_principal),
-                    unfocusedPlaceholderColor = colorResource(R.color.texto_principal),
-                    focusedTextColor = colorResource(R.color.texto_principal),
-                    unfocusedTextColor = colorResource(R.color.texto_principal)
-                )
+                colors = defaultEnfermedadTextFieldColors()
             )
-
-            // Botón para guardar la nueva relación
-            val context = LocalContext.current
 
             Button(
                 onClick = {
@@ -278,15 +171,12 @@ fun GestionarEnfermedadesScreen(
                             viewModel.enfermedadPacienteVM.guardarRelacion(nuevaRelacion)
                             viewModel.pacienteVM.actualizarEnfermedadesDelPaciente(pacienteId)
                             Toast.makeText(context, "Enfermedad guardada", Toast.LENGTH_SHORT).show()
-
-                            // Limpia los campos después de guardar
                             enfermedadSeleccionada = null
                             estado = "Activa"
                             observaciones = ""
                         }
                     }
                 },
-
                 enabled = enfermedadSeleccionada != null,
                 modifier = Modifier.fillMaxWidth(),
                 colors = ButtonDefaults.buttonColors(containerColor = colorResource(R.color.primario))
@@ -298,7 +188,6 @@ fun GestionarEnfermedadesScreen(
 
             Text("Enfermedades asignadas", style = MaterialTheme.typography.titleMedium)
 
-            // Lista de enfermedades asignadas (se mantiene la misma funcionalidad)
             relaciones.forEach { ep ->
                 Card(
                     shape = RoundedCornerShape(16.dp),
@@ -306,18 +195,12 @@ fun GestionarEnfermedadesScreen(
                     elevation = CardDefaults.cardElevation(4.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(
-                        modifier = Modifier.padding(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
+                    Column(modifier = Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("Enfermedad: ${ep.nombre}")
                         Text("Categoría: ${ep.categoria}")
                         Text("Estado: ${ep.estado}")
                         Text("Observaciones: ${ep.observaciones}")
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.End
-                        ) {
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                             IconButton(onClick = {
                                 viewModel.enfermedadPacienteVM.eliminarRelacion(ep.enfermedadPacienteId)
                                 viewModel.pacienteVM.actualizarEnfermedadesDelPaciente(pacienteId)
@@ -329,8 +212,24 @@ fun GestionarEnfermedadesScreen(
                 }
             }
 
-            // Espacio fijo al final para no solapar el BottomNav
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
 }
+
+@Composable
+fun defaultEnfermedadTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = colorResource(R.color.primario),
+    unfocusedBorderColor = colorResource(R.color.texto_principal),
+    cursorColor = colorResource(R.color.primario),
+    focusedLabelColor = colorResource(R.color.primario),
+    unfocusedLabelColor = colorResource(R.color.texto_principal),
+    focusedLeadingIconColor = colorResource(R.color.primario),
+    unfocusedLeadingIconColor = colorResource(R.color.secundario),
+    focusedTrailingIconColor = colorResource(R.color.primario),
+    unfocusedTrailingIconColor = colorResource(R.color.secundario),
+    focusedPlaceholderColor = colorResource(R.color.texto_principal),
+    unfocusedPlaceholderColor = colorResource(R.color.texto_principal),
+    focusedTextColor = colorResource(R.color.texto_principal),
+    unfocusedTextColor = colorResource(R.color.texto_principal)
+)

@@ -60,7 +60,6 @@ fun SplashScreen(navController: NavHostController, viewModel: MainViewModel) {
                 viewModel.grupoVM.cargarGrupo(grupoId)
                 viewModel.pacienteVM.cargarPacientesDelGrupo(grupoId)
             }
-
             navController.navigate("inicio") {
                 popUpTo(0)
             }

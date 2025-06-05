@@ -88,10 +88,4 @@ class GrupoFamiliarViewModel : ViewModel() {
     fun clearGrupo() {
         _grupo.value = null
     }
-
-
-
-
-
-
 }

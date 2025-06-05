@@ -52,7 +52,7 @@ fun BottomNavigationBar(
 
                 // Colores personalizados del ítem
                 colors = NavigationBarItemDefaults.colors(
-                    selectedIconColor = colorResource(R.color.secundario),
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
                     indicatorColor = colorResource(R.color.secundario)
                 )
             )

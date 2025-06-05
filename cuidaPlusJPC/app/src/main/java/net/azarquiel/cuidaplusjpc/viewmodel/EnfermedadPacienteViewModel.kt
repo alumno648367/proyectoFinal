@@ -51,7 +51,4 @@ class EnfermedadPacienteViewModel : ViewModel() {
         enfermedadesPorPaciente.value = emptyMap()
     }
 
-
-
-
 }

@@ -97,45 +97,30 @@ fun GestionarMedicacionScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                // Solo aplicamos el padding superior, no el bottom
-                .padding(top = innerPadding.calculateTopPadding())
-                .padding(horizontal = 24.dp)
+                .padding(top = innerPadding.calculateTopPadding(), start = 24.dp, end = 24.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Text("Nuevo medicamento", style = MaterialTheme.typography.titleMedium)
 
-            DropdownMedicacion("Medicamento", medicamentoSeleccionado,
-                listaMedicamentosMaestro.map { it.nombre }, menuAbierto) {
+            DropdownMedicacion("Medicamento", medicamentoSeleccionado, listaMedicamentosMaestro.map { it.nombre }, menuAbierto) {
                 medicamentoSeleccionado = it
                 menuAbierto = ""
-            }.also {
-                if (menuAbierto != "medicamento") menuAbierto = ""
-                else menuAbierto = "medicamento"
             }
 
             DropdownMedicacion("Dosis", dosisSeleccionada, listaDosis, menuAbierto) {
                 dosisSeleccionada = it
                 menuAbierto = ""
-            }.also {
-                if (menuAbierto != "dosis") menuAbierto = ""
-                else menuAbierto = "dosis"
             }
 
             DropdownMedicacion("Frecuencia", frecuenciaSeleccionada, listaFrecuencias, menuAbierto) {
                 frecuenciaSeleccionada = it
                 menuAbierto = ""
-            }.also {
-                if (menuAbierto != "frecuencia") menuAbierto = ""
-                else menuAbierto = "frecuencia"
             }
 
             DropdownMedicacion("Vía de administración", viaSeleccionada, listaVias, menuAbierto) {
                 viaSeleccionada = it
                 menuAbierto = ""
-            }.also {
-                if (menuAbierto != "via") menuAbierto = ""
-                else menuAbierto = "via"
             }
 
             OutlinedTextField(
@@ -216,7 +201,6 @@ fun GestionarMedicacionScreen(
                 }
             }
 
-            // Espacio fijo para no solapar el BottomNav
             Spacer(modifier = Modifier.height(80.dp))
         }
     }
@@ -256,8 +240,7 @@ fun DropdownMedicacion(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier
-                .background(Color.White)
+            modifier = Modifier.background(Color.White)
         ) {
             options.forEach { opt ->
                 DropdownMenuItem(
@@ -267,7 +250,6 @@ fun DropdownMedicacion(
                         expanded = false
                     },
                     modifier = Modifier.background(colorResource(R.color.white))
-
                 )
             }
         }

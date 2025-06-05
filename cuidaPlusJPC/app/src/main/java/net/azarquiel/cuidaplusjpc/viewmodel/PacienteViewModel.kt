@@ -26,7 +26,6 @@ class PacienteViewModel : ViewModel() {
         }
     }
 
-
     /**
      * Guarda un nuevo paciente en Firestore
      */
@@ -83,7 +82,6 @@ class PacienteViewModel : ViewModel() {
         }
     }
 
-
     fun escucharPacientesDelGrupo(grupoFamiliarId: String) {
         repo.getPacientesDelGrupo(grupoFamiliarId) { lista ->
             pacientesDelGrupo.value = lista
@@ -92,6 +90,5 @@ class PacienteViewModel : ViewModel() {
     fun clearPacientes() {
         pacientesDelGrupo.value = emptyList()
     }
-
 
 }

@@ -280,6 +280,4 @@ class MainViewModel(mainActivity: MainActivity) : ViewModel() {
          col.document(t.tratamientoId).set(t)
       }
    }
-
-
 }

@@ -2,31 +2,19 @@ package net.azarquiel.cuidaplusjpc.screens
 
 import android.annotation.SuppressLint
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Description
-import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.Notes
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -49,27 +37,23 @@ fun CitasScreen(
     padding: PaddingValues = PaddingValues()
 ) {
     val grupo = viewModel.grupoVM.grupo.observeAsState().value
+
     LaunchedEffect(grupo?.grupoFamiliarId) {
         grupo?.let {
             citaViewModel.cargarCitasPorGrupo(it.grupoFamiliarId)
         }
     }
 
-    val citas: List<CitaMedica> = citaViewModel.citas
-
+    val citas = citaViewModel.citas
     var filtro by remember { mutableStateOf("") }
     val citasFiltradas = citas.filter {
         val texto = filtro.trim().lowercase()
-            it.motivo.lowercase().contains(texto) ||
-            it.medico.lowercase().contains(texto) ||
-            it.ubicacion.lowercase().contains(texto) ||
-            it.especialidad.lowercase().contains(texto) ||
-            it.usuarioAcompananteNombre.lowercase().contains(texto)
+        it.motivo.lowercase().contains(texto) ||
+                it.medico.lowercase().contains(texto) ||
+                it.ubicacion.lowercase().contains(texto) ||
+                it.especialidad.lowercase().contains(texto) ||
+                it.usuarioAcompananteNombre.lowercase().contains(texto)
     }
-
-
-
-
 
     Scaffold(
         topBar = { CitasTopBar(grupo?.nombre ?: "") },
@@ -96,9 +80,7 @@ fun CitasScreen(
             viewModel = viewModel
         )
     }
-
 }
-
 
 @Composable
 fun CitasTopBar(nombreGrupo: String) {
@@ -147,17 +129,7 @@ fun CitasContent(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text("Buscar cita...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Buscar") },
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.secundario),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLeadingIconColor = colorResource(R.color.primario),
-                    unfocusedLeadingIconColor = colorResource(R.color.secundario),
-                    focusedPlaceholderColor = Color.Gray,
-                    unfocusedPlaceholderColor = Color.Gray,
-                    focusedTextColor = colorResource(R.color.texto_principal),
-                    unfocusedTextColor = colorResource(R.color.texto_principal)
-                )
+                colors = defaultCitaTextFieldColors()
             )
         }
         if (citas.isEmpty()) {
@@ -174,12 +146,10 @@ fun CitasContent(
             }
         }
         items(citas) { cita ->
-            CitaCard(cita,viewModel)
+            CitaCard(cita, viewModel)
         }
 
-        item {
-            Spacer(modifier = Modifier.height(80.dp))
-        }
+        item { Spacer(modifier = Modifier.height(80.dp)) }
     }
 }
 
@@ -190,28 +160,22 @@ fun CitaCard(cita: CitaMedica, viewModel: MainViewModel) {
     val context = LocalContext.current
     val formatter = SimpleDateFormat("dd/MM/yyyy HH:mm")
     val fechaTexto = formatter.format(cita.fechaHora)
-
     val alpha = if (cita.realizada) 0.4f else 1f
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .alpha(alpha),
+        modifier = Modifier.fillMaxWidth().alpha(alpha),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = colorResource(R.color.color_tarjeta))
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-
             Text(
                 text = paciente?.nombreCompleto?.uppercase() ?: "PACIENTE DESCONOCIDO",
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorResource(R.color.texto_principal),
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .padding(bottom = 8.dp),
-                letterSpacing = 1.5.sp,
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(bottom = 8.dp),
+                letterSpacing = 1.5.sp
             )
 
             Text(
@@ -231,18 +195,12 @@ fun CitaCard(cita: CitaMedica, viewModel: MainViewModel) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "Realizada",
-                        fontWeight = FontWeight.Bold,
-                        color = colorResource(R.color.texto_principal)
-                    )
+                    Text("Realizada", fontWeight = FontWeight.Bold, color = colorResource(R.color.texto_principal))
                     Spacer(modifier = Modifier.width(8.dp))
                     Switch(
                         checked = cita.realizada,
@@ -278,14 +236,9 @@ fun CitaCard(cita: CitaMedica, viewModel: MainViewModel) {
                         }
                     )
                 }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Eliminar cita",
-                        tint = colorResource(R.color.primario)
-                    )
+                    Icon(Icons.Default.Delete, contentDescription = "Eliminar cita", tint = colorResource(R.color.primario))
                 }
             }
-
         }
     }
 }
@@ -303,3 +256,15 @@ fun InfoRow(icon: ImageVector, label: String, valor: String) {
     }
 }
 
+@Composable
+fun defaultCitaTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = colorResource(R.color.primario),
+    unfocusedBorderColor = colorResource(R.color.secundario),
+    cursorColor = colorResource(R.color.primario),
+    focusedLeadingIconColor = colorResource(R.color.primario),
+    unfocusedLeadingIconColor = colorResource(R.color.secundario),
+    focusedPlaceholderColor = Color.Gray,
+    unfocusedPlaceholderColor = Color.Gray,
+    focusedTextColor = colorResource(R.color.texto_principal),
+    unfocusedTextColor = colorResource(R.color.texto_principal)
+)

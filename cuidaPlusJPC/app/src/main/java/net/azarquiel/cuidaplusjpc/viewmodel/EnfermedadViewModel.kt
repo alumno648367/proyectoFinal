@@ -19,7 +19,4 @@ class EnfermedadViewModel : ViewModel() {
             enfermedades.value = lista
         }
     }
-
-
-
 }

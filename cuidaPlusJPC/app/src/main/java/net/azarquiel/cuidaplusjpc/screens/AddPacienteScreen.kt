@@ -8,7 +8,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.MedicalServices
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -108,31 +107,8 @@ fun AddPacienteScreenContent(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        OutlinedTextField(
-            value = nombreCompleto,
-            onValueChange = { nombreCompleto = it },
-            label = { Text("Nombre completo") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.primario),
-                unfocusedBorderColor = colorResource(R.color.texto_principal),
-                cursorColor = colorResource(R.color.primario),
-                focusedLabelColor = colorResource(R.color.primario)
-            )
-        )
-
-        OutlinedTextField(
-            value = direccion,
-            onValueChange = { direccion = it },
-            label = { Text("Dirección") },
-            modifier = Modifier.fillMaxWidth(),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = colorResource(R.color.primario),
-                unfocusedBorderColor = colorResource(R.color.texto_principal),
-                cursorColor = colorResource(R.color.primario),
-                focusedLabelColor = colorResource(R.color.primario)
-            )
-        )
+        CampoTextoPaciente(valor = nombreCompleto, onChange = { nombreCompleto = it }, label = "Nombre completo", modifier = Modifier.fillMaxWidth())
+        CampoTextoPaciente(valor = direccion, onChange = { direccion = it }, label = "Dirección", modifier = Modifier.fillMaxWidth())
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -153,12 +129,7 @@ fun AddPacienteScreenContent(
                 },
                 label = { Text("Fecha de nacimiento") },
                 modifier = Modifier.weight(1f),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.texto_principal),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLabelColor = colorResource(R.color.primario)
-                )
+                colors = defaultPacienteTextFieldColors()
             )
             IconButton(onClick = { datePicker.show() }) {
                 Icon(
@@ -207,3 +178,23 @@ fun AddPacienteScreenContent(
         Spacer(modifier = Modifier.height(80.dp))
     }
 }
+
+
+@Composable
+fun CampoTextoPaciente(valor: String, onChange: (String) -> Unit, label: String, modifier: Modifier = Modifier) {
+    OutlinedTextField(
+        value = valor,
+        onValueChange = onChange,
+        label = { Text(label) },
+        modifier = modifier,
+        colors = defaultPacienteTextFieldColors()
+    )
+}
+
+@Composable
+fun defaultPacienteTextFieldColors() = OutlinedTextFieldDefaults.colors(
+    focusedBorderColor = colorResource(R.color.primario),
+    unfocusedBorderColor = colorResource(R.color.texto_principal),
+    cursorColor = colorResource(R.color.primario),
+    focusedLabelColor = colorResource(R.color.primario)
+)

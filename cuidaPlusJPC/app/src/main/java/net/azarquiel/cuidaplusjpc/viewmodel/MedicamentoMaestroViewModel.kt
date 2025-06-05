@@ -18,5 +18,4 @@ class MedicamentoMaestroViewModel : ViewModel() {
             _medicamentos.value = lista
         }
     }
-
 }

@@ -107,7 +107,6 @@ fun GestionarTratamientosScreen(
     ) { innerPadding ->
         Column(
             modifier = Modifier
-                // Solo aplicamos el padding superior para no incluir el bottom
                 .padding(top = innerPadding.calculateTopPadding())
                 .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
@@ -129,21 +128,13 @@ fun GestionarTratamientosScreen(
                     trailingIcon = {
                         ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedTratamiento)
                     },
-                    modifier = Modifier
-                        .menuAnchor()
-                        .fillMaxWidth(),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.primario),
-                        unfocusedBorderColor = colorResource(R.color.texto_principal),
-                        cursorColor = colorResource(R.color.primario),
-                        focusedLabelColor = colorResource(R.color.primario)
-                    )
+                    modifier = Modifier.menuAnchor().fillMaxWidth(),
+                    colors = defaultEnfermedadTextFieldColors()
                 )
                 ExposedDropdownMenu(
                     expanded = expandedTratamiento,
                     onDismissRequest = { expandedTratamiento = false },
-                    modifier = Modifier
-                        .background(Color.White)
+                    modifier = Modifier.background(Color.White)
                 ) {
                     tratamientosMaestro.forEach { t ->
                         DropdownMenuItem(
@@ -152,8 +143,7 @@ fun GestionarTratamientosScreen(
                                 tratamientoSeleccionado = t
                                 expandedTratamiento = false
                             },
-                            modifier = Modifier
-                                .background(Color.White)
+                            modifier = Modifier.background(Color.White)
                         )
                     }
                 }
@@ -164,18 +154,10 @@ fun GestionarTratamientosScreen(
                 onValueChange = { descripcion = it },
                 label = { Text("Descripción") },
                 modifier = Modifier.fillMaxWidth(),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = colorResource(R.color.primario),
-                    unfocusedBorderColor = colorResource(R.color.texto_principal),
-                    cursorColor = colorResource(R.color.primario),
-                    focusedLabelColor = colorResource(R.color.primario)
-                )
+                colors = defaultEnfermedadTextFieldColors()
             )
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = inicioTexto,
                     onValueChange = {
@@ -183,28 +165,16 @@ fun GestionarTratamientosScreen(
                         try { inicioDate = formato.parse(it) } catch (_: Exception) {}
                     },
                     label = { Text("Inicio") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions.Default,
                     modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.primario),
-                        unfocusedBorderColor = colorResource(R.color.texto_principal),
-                        cursorColor = colorResource(R.color.primario),
-                        focusedLabelColor = colorResource(R.color.primario)
-                    )
+                    colors = defaultEnfermedadTextFieldColors()
                 )
                 IconButton(onClick = { datePickerInicio.show() }) {
-                    Icon(
-                        Icons.Default.CalendarToday,
-                        contentDescription = null,
-                        tint = colorResource(R.color.primario)
-                    )
+                    Icon(Icons.Default.CalendarToday, contentDescription = null, tint = colorResource(R.color.primario))
                 }
             }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.fillMaxWidth()
-            ) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                 OutlinedTextField(
                     value = finTexto,
                     onValueChange = {
@@ -212,21 +182,12 @@ fun GestionarTratamientosScreen(
                         try { finDate = formato.parse(it) } catch (_: Exception) {}
                     },
                     label = { Text("Fin") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    keyboardOptions = KeyboardOptions.Default,
                     modifier = Modifier.weight(1f),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = colorResource(R.color.primario),
-                        unfocusedBorderColor = colorResource(R.color.texto_principal),
-                        cursorColor = colorResource(R.color.primario),
-                        focusedLabelColor = colorResource(R.color.primario)
-                    )
+                    colors = defaultEnfermedadTextFieldColors()
                 )
                 IconButton(onClick = { datePickerFin.show() }) {
-                    Icon(
-                        Icons.Default.CalendarToday,
-                        contentDescription = null,
-                        tint = colorResource(R.color.primario)
-                    )
+                    Icon(Icons.Default.CalendarToday, contentDescription = null, tint = colorResource(R.color.primario))
                 }
             }
 
@@ -260,7 +221,6 @@ fun GestionarTratamientosScreen(
             }
 
             Divider(thickness = 1.dp, color = Color.LightGray)
-
             Text("Tratamientos añadidos", style = MaterialTheme.typography.titleMedium)
 
             tratamientos.forEach { tratamiento ->
@@ -274,10 +234,7 @@ fun GestionarTratamientosScreen(
                         modifier = Modifier.padding(16.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        Text(
-                            "${tratamiento.nombre} (${tratamiento.tipo})",
-                            fontWeight = FontWeight.Bold
-                        )
+                        Text("${tratamiento.nombre} (${tratamiento.tipo})", fontWeight = FontWeight.Bold)
                         Text("Inicio: ${formato.format(tratamiento.inicio)}")
                         Text("Fin: ${formato.format(tratamiento.fin)}")
                         Text("Descripción: ${tratamiento.descripcion}")
@@ -295,7 +252,6 @@ fun GestionarTratamientosScreen(
                 }
             }
 
-            // Espacio fijo para que no pise el BottomNav
             Spacer(modifier = Modifier.height(50.dp))
         }
     }

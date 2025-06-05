@@ -76,7 +76,4 @@ class UsuarioViewModel : ViewModel() {
             usuariosGrupo.value = lista
         }
     }
-
-
-
 }
