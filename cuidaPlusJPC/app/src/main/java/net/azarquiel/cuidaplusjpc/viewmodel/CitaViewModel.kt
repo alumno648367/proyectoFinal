@@ -25,10 +25,12 @@ class CitaViewModel : ViewModel() {
 
     fun cargarCitasPorGrupo(grupoFamiliarId: String) {
         repo.getCitasPorGrupo(grupoFamiliarId) { lista ->
+            val ordenadas = lista.sortedBy { it.realizada }
             citas.clear()
-            citas.addAll(lista)
+            citas.addAll(ordenadas)
         }
     }
+
 
     fun guardarCita(
         cita: CitaMedica,
